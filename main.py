@@ -14,7 +14,7 @@ def load_image(name, color_key=None):
 
 
 class Cursor(pygame.sprite.Sprite):
-    cat_cursor = load_image("Cat_cursor.png")
+    cat_cursor = load_image("cursor/Cat_cursor.png")
 
     def __init__(self, group):
         super().__init__(group)
@@ -29,11 +29,40 @@ class Cursor(pygame.sprite.Sprite):
         self.rect.y = cord[1]
 
 
-def main():
+# class Hero(pygame.sprite.Sprite):
+#     image = load_image("hero_stay.png")
+#
+#     def __init__(self, group):
+#         super().__init__(group)
+#         hero_d = [load_image('hero_d_1.png'), load_image('hero_d_2.png'), load_image('hero_d_3.png'), load_image('hero_d_4.png')]
+#         hero_a = [load_image('hero_a_1.png'), load_image('hero_a_2.png'), load_image('hero_a_3.png'), load_image('hero_a_4.png')]
+#         hero_s = [load_image('hero_s_1.png'), load_image('hero_s_2.png'), load_image('hero_s_3.png'), load_image('hero_s_4.png')]
+#         hero_w = [load_image('hero_w_1.png'), load_image('hero_w_2.png'), load_image('hero_w_3.png'), load_image('hero_w_4.png')]
+#         self.image = Hero.image
+#         self.rect = self.image.get_rect()
+#         self.rect.x = 0
+#         self.rect.y = 0
+#
+#     def update(self, mov):
+#         # mov = args[0].key
+#         if mov == 119:
+#             self.rect = self.rect.move(0, -10)
+#         elif mov == 115:
+#             self.rect = self.rect.move(0, 10)
+#         elif mov == 97:
+#             self.image = load_image("K.png")
+#             self.rect = self.rect.move(-10, 0)
+#         elif mov == 100:
+#             self.image = load_image("K_r.png")
+#             self.rect = self.rect.move(10, 0)
+
+
+def m():
+    running = True
+
     def draw():
         cursor.draw(screen)
 
-    running = True
     while running:
         screen.fill((0, 0, 0))
 
@@ -56,4 +85,4 @@ if __name__ == '__main__':
     pygame.mouse.set_visible(False)
     Cursor(cursor)
 
-    main()
+    m()
