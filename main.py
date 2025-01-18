@@ -117,6 +117,9 @@ def m():
         elif pressed[pygame.K_LEFT] or pressed[pygame.K_a]:
             main_hero.update(97)
 
+        else:
+            main_hero.update(None)
+
         clock.tick(fps)
         draw()
         pygame.display.flip()
