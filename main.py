@@ -35,25 +35,13 @@ class Hero(pygame.sprite.Sprite):
     def __init__(self, group):
         super().__init__(group)
 
-        self.hero_d = [load_image('hero/right/move_d_1.png'), load_image('hero/right/move_d_2.png'),
-                  load_image('hero/right/move_d_3.png'), load_image('hero/right/move_d_4.png'),
-                  load_image('hero/right/move_d_5.png'), load_image('hero/right/move_d_6.png'),
-                  load_image('hero/right/move_d_7.png'), load_image('hero/right/move_d_8.png')]
+        self.hero_d = [load_image(f'hero/right/move_d_{1}.png') for i in range(1, 9)]
 
-        self.hero_a = [load_image('hero/left/move_a_1.png'), load_image('hero/left/move_a_2.png'),
-                  load_image('hero/left/move_a_3.png'), load_image('hero/left/move_a_4.png'),
-                  load_image('hero/left/move_a_5.png'), load_image('hero/left/move_a_6.png'),
-                  load_image('hero/left/move_a_7.png'), load_image('hero/left/move_a_8.png')]
+        self.hero_a = [load_image(f'hero/left/move_a_{1}.png') for i in range(1, 9)]
 
-        self.hero_s = [load_image('hero/down/move_s_1.png'), load_image('hero/down/move_s_2.png'),
-                  load_image('hero/down/move_s_3.png'), load_image('hero/down/move_s_4.png'),
-                  load_image('hero/down/move_s_5.png'), load_image('hero/down/move_s_6.png'),
-                  load_image('hero/down/move_s_7.png'), load_image('hero/down/move_s_8.png')]
+        self.hero_s = [load_image(f'hero/down/move_s_{1}.png') for i in range(1, 9)]
 
-        self.hero_w = [load_image('hero/up/move_w_1.png'), load_image('hero/up/move_w_2.png'),
-                  load_image('hero/up/move_w_3.png'), load_image('hero/up/move_w_4.png'),
-                  load_image('hero/up/move_w_5.png'), load_image('hero/up/move_w_6.png'),
-                  load_image('hero/up/move_w_7.png'), load_image('hero/up/move_w_8.png')]
+        self.hero_w = [load_image(f'hero/up/move_w_{1}.png') for i in range(1, 9)]
 
         self.image = Hero.image
         self.rect = self.image.get_rect()
