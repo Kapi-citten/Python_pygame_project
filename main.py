@@ -7,7 +7,7 @@ def load_image(name, color_key=None):
     fullname = os.path.join('data/image', name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
-        print("Файл с изображением '{fullname}' не найден")
+        print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
     image = pygame.image.load(fullname)
     return image
@@ -28,36 +28,55 @@ class Cursor(pygame.sprite.Sprite):
         self.rect.x = cord[0]
         self.rect.y = cord[1]
 
+# класс глав героя
+class Hero(pygame.sprite.Sprite):
+    image = load_image("hero_stay.png")
 
-# class Hero(pygame.sprite.Sprite):
-#     image = load_image("hero_stay.png")
-#
-#     def __init__(self, group):
-#         super().__init__(group)
-#         hero_d = [load_image('hero_d_1.png'), load_image('hero_d_2.png'), load_image('hero_d_3.png'), load_image('hero_d_4.png')]
-#         hero_a = [load_image('hero_a_1.png'), load_image('hero_a_2.png'), load_image('hero_a_3.png'), load_image('hero_a_4.png')]
-#         hero_s = [load_image('hero_s_1.png'), load_image('hero_s_2.png'), load_image('hero_s_3.png'), load_image('hero_s_4.png')]
-#         hero_w = [load_image('hero_w_1.png'), load_image('hero_w_2.png'), load_image('hero_w_3.png'), load_image('hero_w_4.png')]
-#         self.image = Hero.image
-#         self.rect = self.image.get_rect()
-#         self.rect.x = 0
-#         self.rect.y = 0
-#
-#     def update(self, mov):
-#         # mov = args[0].key
-#         if mov == 119:
-#             self.rect = self.rect.move(0, -10)
-#         elif mov == 115:
-#             self.rect = self.rect.move(0, 10)
-#         elif mov == 97:
-#             self.image = load_image("K.png")
-#             self.rect = self.rect.move(-10, 0)
-#         elif mov == 100:
-#             self.image = load_image("K_r.png")
-#             self.rect = self.rect.move(10, 0)
+    def __init__(self, group):
+        super().__init__(group)
+        hero_d = [load_image('hero_d_1.png'), load_image('hero_d_2.png'), load_image('hero_d_3.png'), load_image('hero_d_4.png')]
+        hero_a = [load_image('hero_a_1.png'), load_image('hero_a_2.png'), load_image('hero_a_3.png'), load_image('hero_a_4.png')]
+        hero_s = [load_image('hero_s_1.png'), load_image('hero_s_2.png'), load_image('hero_s_3.png'), load_image('hero_s_4.png')]
+        hero_w = [load_image('hero_w_1.png'), load_image('hero_w_2.png'), load_image('hero_w_3.png'), load_image('hero_w_4.png')]
+        self.image = Hero.image
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+        self.frame_index = 0
+        self.direction = 'stay'
+        self.animations = {
+            'w': self.hero_w,
+            's': self.hero_s,
+            'a': self.hero_a,
+            'd': self.hero_d
+        }
+
+    def update(self, mov):
+        if mov == 119:
+            self.direction = 'w'
+            self.rect = self.rect.move(0, -10)
+        elif mov == 115:
+            self.direction = 's'
+            self.rect = self.rect.move(0, 10)
+        elif mov == 97:
+            self.direction = 'a'
+            self.rect = self.rect.move(-10, 0)
+        elif mov == 100:
+            self.direction = 'd'
+            self.rect = self.rect.move(10, 0)
+        else:
+            self.direction = 'stay'
+
+    def update_animation(self):
+        if self.direction in self.animations:
+            frames = self.animations[self.direction]
+            self.frame_index += 0.2
+            if self.frame_index >= len(frames):
+                self.frame_index = 0
+            self.image = frames[int(self.frame_index)]
 
 
-def m():
+def main():
     running = True
 
     def draw():
@@ -85,4 +104,4 @@ if __name__ == '__main__':
     pygame.mouse.set_visible(False)
     Cursor(cursor)
 
-    m()
+    main()
