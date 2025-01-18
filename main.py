@@ -80,6 +80,8 @@ class Hero(pygame.sprite.Sprite):
             self.image = self.hero_d[self.mov_index // 8]
             self.rect = self.rect.move(3, 0)
 
+        else:
+            self.image = self.hero_s[0]
         self.mov_index += 1
         if self.mov_index >= 64:
             self.mov_index = 0
@@ -101,6 +103,7 @@ def m():
                 running = False
             if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
                 cursor.update(event)
+
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_UP] or pressed[pygame.K_w]:
             main_hero.update(119)
