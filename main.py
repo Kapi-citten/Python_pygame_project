@@ -34,10 +34,10 @@ class Hero(pygame.sprite.Sprite):
 
     def __init__(self, group):
         super().__init__(group)
-        hero_d = [load_image('hero_d_1.png'), load_image('hero_d_2.png'), load_image('hero_d_3.png'), load_image('hero_d_4.png')]
-        hero_a = [load_image('hero_a_1.png'), load_image('hero_a_2.png'), load_image('hero_a_3.png'), load_image('hero_a_4.png')]
-        hero_s = [load_image('hero_s_1.png'), load_image('hero_s_2.png'), load_image('hero_s_3.png'), load_image('hero_s_4.png')]
-        hero_w = [load_image('hero_w_1.png'), load_image('hero_w_2.png'), load_image('hero_w_3.png'), load_image('hero_w_4.png')]
+        hero_d = [load_image(f'hero_d_{i}.png') for i in range(1, 5)]
+        hero_a = [load_image(f'hero_a_{i}.png') for i in range(1, 5)]
+        hero_s = [load_image(f'hero_s_{i}.png') for i in range(1, 5)]
+        hero_w = [load_image(f'hero_w_{i}.png') for i in range(1, 5)]
         self.image = Hero.image
         self.rect = self.image.get_rect()
         self.rect.x = 0
