@@ -95,8 +95,11 @@ class Hero(pygame.sprite.Sprite):
         super().__init__(group)
 
         self.hero_d = [load_image(f"hero/right/move_d_{i}.png") for i in range(1, 9)]
+
         self.hero_a = [load_image(f"hero/left/move_a_{i}.png") for i in range(1, 9)]
+
         self.hero_s = [load_image(f"hero/down/move_s_{i}.png") for i in range(1, 9)]
+
         self.hero_w = [load_image(f"hero/up/move_w_{i}.png") for i in range(1, 9)]
 
         self.hero_wd = [load_image(f"hero/up_right/move_w_d_{i}.png") for i in range(1, 9)]
