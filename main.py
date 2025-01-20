@@ -42,6 +42,52 @@ class Wall(pygame.sprite.Sprite):
         return self.rect.colliderect(sprite.rect)
 
 
+class Button:
+    def __init__(self, x, y, width, height, text, image_path, hover_image_path=None, sound_aim=None, sound_clik=None):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+
+        self.image = load_image(image_path)
+        self.image = pygame.transform.scale(self.image, (width, height))
+
+        if hover_image_path is None:
+            self.hover_image = self.image
+        else:
+            self.hover_image = load_image(hover_image_path)
+            self.hover_image = pygame.transform.scale(self.hover_image, (width, height))
+
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+        if sound_aim:
+            self.sound_aim = pygame.mixer.Sound(sound_aim)
+        else:
+            self.sound_aim = None
+
+        if sound_clik:
+            self.sound_clik = pygame.mixer.Sound(sound_clik)
+        else:
+            self.sound_clik = None
+
+
+    def draw(self, scr, mouse_pos):
+
+            if self.rect.collidepoint(mouse_pos):
+                scr.blit(self.hover_image, (self.x, self.y))
+                # if self.sound_aim:
+                #     self.sound_aim.play()
+            else:
+                scr.blit(self.image, (self.x, self.y))
+
+    def event(self, mouse_pos, *event):
+        if self.rect.collidepoint(mouse_pos) and event[0].button == 1:
+            if self.sound_clik:
+                self.sound_clik.play()
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
+
+
 class Hero(pygame.sprite.Sprite):
     image = load_image("hero/down/move_s_1.png")
 
@@ -57,7 +103,6 @@ class Hero(pygame.sprite.Sprite):
         self.hero_wa = [load_image(f"hero/up_left/move_w_a_{i}.png") for i in range(1, 9)]
         self.hero_sa = [load_image(f"hero/down_left/move_s_a_{i}.png") for i in range(1, 9)]
         self.hero_sd = [load_image(f"hero/down_right/move_s_d_{i}.png") for i in range(1, 9)]
-
 
         self.image = Hero.image
         self.rect = self.image.get_rect()
@@ -114,6 +159,47 @@ class Hero(pygame.sprite.Sprite):
         for wall in walls_group:
             if wall.check_collision(self):
                 self.rect = old_rect
+
+
+def main_menu():
+
+    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    # button_music = Button
+    main_music = pygame.mixer.Sound('data/music/main_menu/Night of Bloom.mp3')
+    main_music.play(-1)
+
+    running = True
+    new = False
+    background = load_image('main_menu/main_background.jpg')
+
+    def draw():
+        screen.blit(background, (0, 0))
+        button_exit.draw(screen, pygame.mouse.get_pos())
+        button_start.draw(screen, pygame.mouse.get_pos())
+        cursor.draw(screen)
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
+                cursor.update(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_focused():
+                button_start.event(pygame.mouse.get_pos(), event)
+                button_exit.event(pygame.mouse.get_pos(), event)
+
+            if event.type == pygame.USEREVENT and event.button == button_exit:
+                running = False
+            if event.type == pygame.USEREVENT and event.button == button_start:
+                running = False
+                new = True
+        clock.tick(fps)
+        draw()
+        pygame.display.flip()
+    if new:
+        m()
+    pygame.quit()
 
 
 def m():
@@ -184,7 +270,7 @@ def m():
 
 if __name__ == "__main__":
     pygame.init()
-    size = width, height = 800, 400
+    size = width, height = 1200, 630
     screen = pygame.display.set_mode(size)
 
     speed = 2
@@ -195,4 +281,4 @@ if __name__ == "__main__":
     pygame.mouse.set_visible(False)
     Cursor(cursor)
 
-    m()
+    main_menu()
