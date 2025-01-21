@@ -2,9 +2,11 @@ import pygame
 import os
 import sys
 
+
 def terminate():
     pygame.quit()
     sys.exit()
+
 
 def load_image(name, color_key=None):
     fullname = os.path.join("data/image", name)
@@ -75,18 +77,17 @@ class Button:
         else:
             self.sound_clik = None
 
-
     def draw(self, scr, mouse_pos):
 
-            if self.rect.collidepoint(mouse_pos):
-                scr.blit(self.hover_image, (self.x, self.y))
+        if self.rect.collidepoint(mouse_pos):
+            scr.blit(self.hover_image, (self.x, self.y))
 
-                if self.sound_aim and self.is_aim_sound:
-                    self.sound_aim.play()
-                    self.is_aim_sound = False
-            else:
-                self.is_aim_sound = True
-                scr.blit(self.image, (self.x, self.y))
+            if self.sound_aim and self.is_aim_sound:
+                self.sound_aim.play()
+                self.is_aim_sound = False
+        else:
+            self.is_aim_sound = True
+            scr.blit(self.image, (self.x, self.y))
 
     def event(self, mouse_pos, *event):
         if self.rect.collidepoint(mouse_pos) and event[0].button == 1:
@@ -159,18 +160,46 @@ class Hero(pygame.sprite.Sprite):
             if wall.check_collision(self):
                 self.rect = old_rect
 
+# class Dialog:
+#     # TODO: базовое окно для диалога со всеми отдельными персонажами
+#     def __init__(self, scp_text_list, hero_text_list, npc_img_list, hero_img_list, x=0, y=600, width=1200,
+#                  height=100, color='blue'):
+#         self.x = x
+#         self.y = y
+#         self.width = width
+#         self.height = height
+#         self.scp_text = scp_text_list
+#         self.hero_text = hero_text_list
+#         self.rect = pygame.Rect(x, y, width, height)
+#         self.color = color
+#
+#         self.image_npc = [load_image(npc_img_list[i]) for i in range(len(npc_img_list))]
+#         self.image_hero = [load_image(hero_img_list[i]) for i in range(len(hero_img_list))]
+#
+#         self.image = pygame.transform.scale(self.image, (width, height))
+#
+#         self.rect = self.image.get_rect(topleft=(x, y))
+#
+#     def dialog(self):
+#         screen.fill(pygame.Color(self.color), self.rect)
 
-class Dialog:
-    # TODO: базовое окно для диалога со всеми отдельными персонажами
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+# class Fight:
+#     def __init__(self, npc, weapon_list, hp, damage):
+#         self.image = load_image(npc)
+#         self.weapon = weapon_list
+#         self.hp = hp
+#         self.damage = damage
+#
+#         self.hero = load_image('')
+#         self.mask = pygame.mask.from_surface(self.image)
+#         self.hero_hp = 50
 
 
 def main_menu():
-
-    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
-    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
+                          'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png',
+                         'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
     # button_music = Button
     main_music = pygame.mixer.Sound('data/music/main_menu/Night of Bloom.mp3')
     main_music.play(-1)
@@ -206,11 +235,11 @@ def main_menu():
 
     if new:
         main_music.stop()
-        m()
+        start()
     terminate()
 
 
-def m():
+def start():
     main_hero = pygame.sprite.Group()
     Hero(main_hero)
     running = True
@@ -228,6 +257,7 @@ def m():
         Wall(x, y, width, height, texture_path, walls_group)
 
     def draw():
+        screen.blit('')
         main_hero.draw(screen)
         walls_group.draw(screen)
         cursor.draw(screen)
@@ -290,4 +320,3 @@ if __name__ == "__main__":
     Cursor(cursor)
 
     main_menu()
-    
