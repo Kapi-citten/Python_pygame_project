@@ -2,11 +2,9 @@ import pygame
 import os
 import sys
 
-
 def terminate():
     pygame.quit()
     sys.exit()
-
 
 def load_image(name, color_key=None):
     fullname = os.path.join("data/image", name)
@@ -47,8 +45,24 @@ class Wall(pygame.sprite.Sprite):
         return self.rect.colliderect(sprite.rect)
 
 
+class Door(Wall):
+    pass
+
+
 class Button:
-    def __init__(self, x, y, width, height, text, image_path, hover_image_path=None, sound_aim=None, sound_clik=None):
+    def __init__(
+        self,
+        x,
+        y,
+        width,
+        height,
+        text,
+        image_path,
+        hover_image_path=None,
+        sound_aim=None,
+        sound_clik=None,
+        is_aim_sound=True):
+
         self.x = x
         self.y = y
         self.width = width
@@ -128,27 +142,35 @@ class Hero(pygame.sprite.Sprite):
         if mov == 'wd':
             self.image = self.hero_wd[self.mov_index // 8]
             self.rect = self.rect.move(speed, -speed)
+
         elif mov == 'wa':
             self.image = self.hero_wa[self.mov_index // 8]
             self.rect = self.rect.move(-speed, -speed)
+
         elif mov == 'sa':
             self.image = self.hero_sa[self.mov_index // 8]
             self.rect = self.rect.move(-speed, speed)
+
         elif mov == 'sd':
             self.image = self.hero_sd[self.mov_index // 8]
             self.rect = self.rect.move(speed, speed)
+
         elif mov == 'w':
             self.image = self.hero_w[self.mov_index // 8]
             self.rect = self.rect.move(0, -speed)
+
         elif mov == 's':
             self.image = self.hero_s[self.mov_index // 8]
             self.rect = self.rect.move(0, speed)
+
         elif mov == 'a':
             self.image = self.hero_a[self.mov_index // 8]
             self.rect = self.rect.move(-speed, 0)
+
         elif mov == 'd':
             self.image = self.hero_d[self.mov_index // 8]
             self.rect = self.rect.move(speed, 0)
+
         else:
             self.image = self.hero_s[0]
 
@@ -196,10 +218,9 @@ class Hero(pygame.sprite.Sprite):
 
 
 def main_menu():
-    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
-                          'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
-    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png',
-                         'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+
+    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
     # button_music = Button
     main_music = pygame.mixer.Sound('data/music/main_menu/Night of Bloom.mp3')
     main_music.play(-1)
@@ -244,7 +265,7 @@ def start():
     Hero(main_hero)
     running = True
     walls_group = pygame.sprite.Group()
-    texture_path = "hero/down/move_s_1.png"
+    texture_path = "walls/pixelbuildings128-v1-raw-_00044_.png"
     walls_data = [
         (100, 100, 50, 200),
         (300, 50, 100, 50),
@@ -257,7 +278,6 @@ def start():
         Wall(x, y, width, height, texture_path, walls_group)
 
     def draw():
-        screen.blit('')
         main_hero.draw(screen)
         walls_group.draw(screen)
         cursor.draw(screen)
