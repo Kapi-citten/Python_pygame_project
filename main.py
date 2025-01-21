@@ -2,6 +2,9 @@ import pygame
 import os
 import sys
 
+def terminate():
+    pygame.quit()
+    sys.exit()
 
 def load_image(name, color_key=None):
     fullname = os.path.join("data/image", name)
@@ -49,6 +52,7 @@ class Button:
         self.width = width
         self.height = height
         self.text = text
+        self.is_aim_sound = True
 
         self.image = load_image(image_path)
         self.image = pygame.transform.scale(self.image, (width, height))
@@ -76,9 +80,12 @@ class Button:
 
             if self.rect.collidepoint(mouse_pos):
                 scr.blit(self.hover_image, (self.x, self.y))
-                # if self.sound_aim:
-                #     self.sound_aim.play()
+
+                if self.sound_aim and self.is_aim_sound:
+                    self.sound_aim.play()
+                    self.is_aim_sound = False
             else:
+                self.is_aim_sound = True
                 scr.blit(self.image, (self.x, self.y))
 
     def event(self, mouse_pos, *event):
@@ -120,38 +127,27 @@ class Hero(pygame.sprite.Sprite):
         if mov == 'wd':
             self.image = self.hero_wd[self.mov_index // 8]
             self.rect = self.rect.move(speed, -speed)
-
         elif mov == 'wa':
             self.image = self.hero_wa[self.mov_index // 8]
             self.rect = self.rect.move(-speed, -speed)
-
         elif mov == 'sa':
             self.image = self.hero_sa[self.mov_index // 8]
             self.rect = self.rect.move(-speed, speed)
-
         elif mov == 'sd':
             self.image = self.hero_sd[self.mov_index // 8]
             self.rect = self.rect.move(speed, speed)
-
         elif mov == 'w':
             self.image = self.hero_w[self.mov_index // 8]
             self.rect = self.rect.move(0, -speed)
-
         elif mov == 's':
             self.image = self.hero_s[self.mov_index // 8]
             self.rect = self.rect.move(0, speed)
-
         elif mov == 'a':
             self.image = self.hero_a[self.mov_index // 8]
             self.rect = self.rect.move(-speed, 0)
-
         elif mov == 'd':
             self.image = self.hero_d[self.mov_index // 8]
             self.rect = self.rect.move(speed, 0)
-
-
-
-
         else:
             self.image = self.hero_s[0]
 
@@ -162,6 +158,13 @@ class Hero(pygame.sprite.Sprite):
         for wall in walls_group:
             if wall.check_collision(self):
                 self.rect = old_rect
+
+
+class Dialog:
+    # TODO: базовое окно для диалога со всеми отдельными персонажами
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 
 def main_menu():
@@ -200,9 +203,11 @@ def main_menu():
         clock.tick(fps)
         draw()
         pygame.display.flip()
+
     if new:
+        main_music.stop()
         m()
-    pygame.quit()
+    terminate()
 
 
 def m():
@@ -285,3 +290,4 @@ if __name__ == "__main__":
     Cursor(cursor)
 
     main_menu()
+    
