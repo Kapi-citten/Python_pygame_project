@@ -42,8 +42,24 @@ class Wall(pygame.sprite.Sprite):
         return self.rect.colliderect(sprite.rect)
 
 
+class Door(Wall):
+    pass
+
+
 class Button:
-    def __init__(self, x, y, width, height, text, image_path, hover_image_path=None, sound_aim=None, sound_clik=None):
+    def __init__(
+        self,
+        x,
+        y,
+        width,
+        height,
+        text,
+        image_path,
+        hover_image_path=None,
+        sound_aim=None,
+        sound_clik=None,
+        is_aim_sound=True,
+    ):
         self.x = x
         self.y = y
         self.width = width
@@ -71,15 +87,15 @@ class Button:
         else:
             self.sound_clik = None
 
-
     def draw(self, scr, mouse_pos):
 
-            if self.rect.collidepoint(mouse_pos):
-                scr.blit(self.hover_image, (self.x, self.y))
-                # if self.sound_aim:
-                #     self.sound_aim.play()
-            else:
-                scr.blit(self.image, (self.x, self.y))
+        if self.rect.collidepoint(mouse_pos):
+            scr.blit(self.hover_image, (self.x, self.y))
+            if self.sound_aim:
+                self.sound_aim.play()
+
+        else:
+            scr.blit(self.image, (self.x, self.y))
 
     def event(self, mouse_pos, *event):
         if self.rect.collidepoint(mouse_pos) and event[0].button == 1:
@@ -102,10 +118,18 @@ class Hero(pygame.sprite.Sprite):
 
         self.hero_w = [load_image(f"hero/up/move_w_{i}.png") for i in range(1, 9)]
 
-        self.hero_wd = [load_image(f"hero/up_right/move_w_d_{i}.png") for i in range(1, 9)]
-        self.hero_wa = [load_image(f"hero/up_left/move_w_a_{i}.png") for i in range(1, 9)]
-        self.hero_sa = [load_image(f"hero/down_left/move_s_a_{i}.png") for i in range(1, 9)]
-        self.hero_sd = [load_image(f"hero/down_right/move_s_d_{i}.png") for i in range(1, 9)]
+        self.hero_wd = [
+            load_image(f"hero/up_right/move_w_d_{i}.png") for i in range(1, 9)
+        ]
+        self.hero_wa = [
+            load_image(f"hero/up_left/move_w_a_{i}.png") for i in range(1, 9)
+        ]
+        self.hero_sa = [
+            load_image(f"hero/down_left/move_s_a_{i}.png") for i in range(1, 9)
+        ]
+        self.hero_sd = [
+            load_image(f"hero/down_right/move_s_d_{i}.png") for i in range(1, 9)
+        ]
 
         self.image = Hero.image
         self.rect = self.image.get_rect()
@@ -117,40 +141,37 @@ class Hero(pygame.sprite.Sprite):
         # mov = args[0].key
         old_rect = self.rect.copy()
 
-        if mov == 'wd':
+        if mov == "wd":
             self.image = self.hero_wd[self.mov_index // 8]
             self.rect = self.rect.move(speed, -speed)
 
-        elif mov == 'wa':
+        elif mov == "wa":
             self.image = self.hero_wa[self.mov_index // 8]
             self.rect = self.rect.move(-speed, -speed)
 
-        elif mov == 'sa':
+        elif mov == "sa":
             self.image = self.hero_sa[self.mov_index // 8]
             self.rect = self.rect.move(-speed, speed)
 
-        elif mov == 'sd':
+        elif mov == "sd":
             self.image = self.hero_sd[self.mov_index // 8]
             self.rect = self.rect.move(speed, speed)
 
-        elif mov == 'w':
+        elif mov == "w":
             self.image = self.hero_w[self.mov_index // 8]
             self.rect = self.rect.move(0, -speed)
 
-        elif mov == 's':
+        elif mov == "s":
             self.image = self.hero_s[self.mov_index // 8]
             self.rect = self.rect.move(0, speed)
 
-        elif mov == 'a':
+        elif mov == "a":
             self.image = self.hero_a[self.mov_index // 8]
             self.rect = self.rect.move(-speed, 0)
 
-        elif mov == 'd':
+        elif mov == "d":
             self.image = self.hero_d[self.mov_index // 8]
             self.rect = self.rect.move(speed, 0)
-
-
-
 
         else:
             self.image = self.hero_s[0]
@@ -166,15 +187,35 @@ class Hero(pygame.sprite.Sprite):
 
 def main_menu():
 
-    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
-    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    button_start = Button(
+        width / 2 - (370 / 2),
+        70,
+        370,
+        150,
+        "",
+        "main_menu/new_1.png",
+        "main_menu/new_2.png",
+        "data/music/main_menu/button/aim.mp3",
+        "data/music/main_menu/button/clik.mp3",
+    )
+    button_exit = Button(
+        900,
+        500,
+        300,
+        120,
+        "",
+        "main_menu/exit_1.png",
+        "main_menu/exit_2.png",
+        "data/music/main_menu/button/aim.mp3",
+        "data/music/main_menu/button/clik.mp3",
+    )
     # button_music = Button
-    main_music = pygame.mixer.Sound('data/music/main_menu/Night of Bloom.mp3')
+    main_music = pygame.mixer.Sound("data/music/main_menu/Night of Bloom.mp3")
     main_music.play(-1)
 
     running = True
     new = False
-    background = load_image('main_menu/main_background.jpg')
+    background = load_image("main_menu/main_background.jpg")
 
     def draw():
         screen.blit(background, (0, 0))
@@ -201,6 +242,7 @@ def main_menu():
         draw()
         pygame.display.flip()
     if new:
+        main_music.stop()
         m()
     pygame.quit()
 
@@ -210,7 +252,7 @@ def m():
     Hero(main_hero)
     running = True
     walls_group = pygame.sprite.Group()
-    texture_path = "hero/down/move_s_1.png"
+    texture_path = "walls/pixelbuildings128-v1-raw-_00044_.png"
     walls_data = [
         (100, 100, 50, 200),
         (300, 50, 100, 50),
@@ -238,29 +280,37 @@ def m():
 
         pressed = pygame.key.get_pressed()
 
-        if (pressed[pygame.K_UP] or pressed[pygame.K_w]) and (pressed[pygame.K_RIGHT] or pressed[pygame.K_d]):
-            main_hero.update('wd', walls_group)
+        if (pressed[pygame.K_UP] or pressed[pygame.K_w]) and (
+            pressed[pygame.K_RIGHT] or pressed[pygame.K_d]
+        ):
+            main_hero.update("wd", walls_group)
 
-        elif (pressed[pygame.K_UP] or pressed[pygame.K_w]) and (pressed[pygame.K_LEFT] or pressed[pygame.K_a]):
-            main_hero.update('wa', walls_group)
+        elif (pressed[pygame.K_UP] or pressed[pygame.K_w]) and (
+            pressed[pygame.K_LEFT] or pressed[pygame.K_a]
+        ):
+            main_hero.update("wa", walls_group)
 
-        elif (pressed[pygame.K_DOWN] or pressed[pygame.K_s]) and (pressed[pygame.K_RIGHT] or pressed[pygame.K_d]):
-            main_hero.update('sd', walls_group)
+        elif (pressed[pygame.K_DOWN] or pressed[pygame.K_s]) and (
+            pressed[pygame.K_RIGHT] or pressed[pygame.K_d]
+        ):
+            main_hero.update("sd", walls_group)
 
-        elif (pressed[pygame.K_DOWN] or pressed[pygame.K_s]) and (pressed[pygame.K_LEFT] or pressed[pygame.K_a]):
-            main_hero.update('sa', walls_group)
+        elif (pressed[pygame.K_DOWN] or pressed[pygame.K_s]) and (
+            pressed[pygame.K_LEFT] or pressed[pygame.K_a]
+        ):
+            main_hero.update("sa", walls_group)
 
         elif pressed[pygame.K_UP] or pressed[pygame.K_w]:
-            main_hero.update('w', walls_group)
+            main_hero.update("w", walls_group)
 
         elif pressed[pygame.K_RIGHT] or pressed[pygame.K_d]:
-            main_hero.update('d', walls_group)
+            main_hero.update("d", walls_group)
 
         elif pressed[pygame.K_DOWN] or pressed[pygame.K_s]:
-            main_hero.update('s', walls_group)
+            main_hero.update("s", walls_group)
 
         elif pressed[pygame.K_LEFT] or pressed[pygame.K_a]:
-            main_hero.update('a', walls_group)
+            main_hero.update("a", walls_group)
 
         else:
             main_hero.update(None, walls_group)
