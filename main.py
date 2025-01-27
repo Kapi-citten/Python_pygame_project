@@ -2,9 +2,11 @@ import pygame
 import os
 import sys
 
+
 def terminate():
     pygame.quit()
     sys.exit()
+
 
 def load_image(name, color_key=None):
     fullname = os.path.join("data/image", name)
@@ -33,16 +35,12 @@ class Cursor(pygame.sprite.Sprite):
 
 
 class Wall(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, texture_path, group):
+    def __init__(self, x, y, w, h, image_path, group):
         super().__init__(group)
-        self.image = load_image(texture_path)
-        self.image = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
-    def check_collision(self, sprite):
-        return self.rect.colliderect(sprite.rect)
+        self.image = load_image(image_path)
+        self.image = pygame.transform.scale(self.image, (w, h))
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 class Door(Wall):
@@ -51,17 +49,17 @@ class Door(Wall):
 
 class Button:
     def __init__(
-        self,
-        x,
-        y,
-        width,
-        height,
-        text,
-        image_path,
-        hover_image_path=None,
-        sound_aim=None,
-        sound_clik=None,
-        is_aim_sound=True):
+            self,
+            x,
+            y,
+            width,
+            height,
+            text,
+            image_path,
+            hover_image_path=None,
+            sound_aim=None,
+            sound_clik=None,
+            is_aim_sound=True):
 
         self.x = x
         self.y = y
@@ -134,6 +132,7 @@ class Hero(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
         self.mov_index = 0
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, mov, walls_group):
         # mov = args[0].key
@@ -178,9 +177,92 @@ class Hero(pygame.sprite.Sprite):
         if self.mov_index >= 64:
             self.mov_index = 0
 
+        # self.mask = pygame.mask.from_surface(self.image)
         for wall in walls_group:
-            if wall.check_collision(self):
+            if pygame.sprite.collide_mask(self, wall):
                 self.rect = old_rect
+
+    def get(self):
+        return self.image
+
+
+class HeroFight(pygame.sprite.Sprite):
+    def __init__(self, group):
+        pygame.sprite.Sprite.__init__(self, group)
+        self.image = load_image('fight/heart.png')
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect.x = 301
+        self.rect.y = 301
+
+    def update(self, mov, walls):
+        old_rect = self.rect.copy()
+
+        if mov == 'wd':
+            self.rect = self.rect.move(speed, -speed)
+
+        elif mov == 'wa':
+            self.rect = self.rect.move(-speed, -speed)
+
+        elif mov == 'sa':
+            self.rect = self.rect.move(-speed, speed)
+
+        elif mov == 'sd':
+            self.rect = self.rect.move(speed, speed)
+
+        elif mov == 'w':
+            self.rect = self.rect.move(0, -speed)
+
+        elif mov == 's':
+            self.rect = self.rect.move(0, speed)
+
+        elif mov == 'a':
+            self.rect = self.rect.move(-speed, 0)
+
+        elif mov == 'd':
+            self.rect = self.rect.move(speed, 0)
+
+        if not walls.contains(self.rect):
+            self.rect = old_rect
+
+class Map:
+    def __init__(self, image_path):
+        self.image = load_image(image_path)
+        self.rect = self.image.get_rect()
+
+    def draw(self, camera_offset):
+        # Рисуем карту с учётом сдвига камеры
+        screen.blit(self.image, (-camera_offset[0], -camera_offset[1]))
+
+
+class Camera:
+    def __init__(self, screen_width, screen_height, map_width, map_height):
+        self.offset_x = 0
+        self.offset_y = 0
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.map_width = map_width
+        self.map_height = map_height
+
+    def update(self, target):
+        target_x = target.rect.centerx - self.screen_width // 2
+        target_y = target.rect.centery - self.screen_height // 2
+
+        target_x = max(0, min(target_x, self.map_width - self.screen_width))
+        target_y = max(0, min(target_y, self.map_height - self.screen_height))
+
+        self.offset_x += -2  # (target_x - self.offset_x) * 0.1
+        self.offset_y += -2  # (target_y - self.offset_y) * 0.1
+
+        # def update(self, target):
+        #     self.offset_x = max(0, min(target.rect.centerx - self.screen_width // 2, self.map_width - self.screen_width))
+        #     self.offset_y = max(0, min(target.rect.centery - self.screen_height // 2, self.map_height - self.screen_height))
+
+        print(self.offset_y, self.offset_x)
+
+    def get_offset(self):
+        return [self.offset_x, self.offset_y]
+
 
 # class Dialog:
 #     # TODO: базовое окно для диалога со всеми отдельными персонажами
@@ -205,22 +287,105 @@ class Hero(pygame.sprite.Sprite):
 #     def dialog(self):
 #         screen.fill(pygame.Color(self.color), self.rect)
 
-# class Fight:
-#     def __init__(self, npc, weapon_list, hp, damage):
-#         self.image = load_image(npc)
-#         self.weapon = weapon_list
-#         self.hp = hp
-#         self.damage = damage
-#
-#         self.hero = load_image('')
-#         self.mask = pygame.mask.from_surface(self.image)
-#         self.hero_hp = 50
+class MainFight:
+    def __init__(self, npc, weapon_list, hp, damage):
+        screen.fill((0, 0, 0))
+        self.fps = 170
+
+        self.image_npc = npc
+        self.rect_npc = self.image_npc.get_rect()
+        self.rect_npc.center = (600, 100)
+
+        self.weapon = weapon_list
+        self.weapon_in_battle = pygame.sprite.Group()
+        self.hp = hp
+        self.damage = damage
+
+        self.hero_group = pygame.sprite.Group()
+        HeroFight(self.hero_group)
+        self.hero = self.hero_group.sprites()[0]
+        self.hero_hp = 50
+        self.rect = pygame.Rect(100, 250, 1000, 370)
+
+        # self.mask = pygame.mask.Mask((self.rect.width, self.rect.height))
+        # self.mask.fill()
+
+        # self.rect_mask = pygame.mask.Mask.get_rect(width=1000, height=600, center=(10, 5))
+        pygame.draw.rect(screen, 'red', self.rect, 8)
+        self.battle_analysis()
+
+    def draw_fight(self):
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, 'red', self.rect, 8)
+        screen.blit(self.image_npc, self.rect_npc)
+        self.hero_group.draw(screen)
+        cursor.draw(screen)
+
+    def draw(self):
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, 'red', self.rect, 8)
+        screen.blit(self.image_npc, self.rect_npc)
+        self.hero_group.draw(screen)
+        cursor.draw(screen)
+        #TODO: Кнопки пощады и атаки.. может быть и действия
+
+    def battle_analysis(self):
+        run = True
+        while run:
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
+                    cursor.update(event)
+
+            if self.rect.contains(self.hero.rect):
+                pressed = pygame.key.get_pressed()
+
+                if (pressed[pygame.K_UP] or pressed[pygame.K_w]) and (pressed[pygame.K_RIGHT] or pressed[pygame.K_d]):
+                    self.hero_group.update('wd', self.rect)
+
+                elif (pressed[pygame.K_UP] or pressed[pygame.K_w]) and (pressed[pygame.K_LEFT] or pressed[pygame.K_a]):
+                    self.hero_group.update('wa', self.rect)
+
+                elif (pressed[pygame.K_DOWN] or pressed[pygame.K_s]) and (
+                        pressed[pygame.K_RIGHT] or pressed[pygame.K_d]):
+                    self.hero_group.update('sd', self.rect)
+
+                elif (pressed[pygame.K_DOWN] or pressed[pygame.K_s]) and (
+                        pressed[pygame.K_LEFT] or pressed[pygame.K_a]):
+                    self.hero_group.update('sa', self.rect)
+
+                elif pressed[pygame.K_UP] or pressed[pygame.K_w]:
+                    self.hero_group.update('w', self.rect)
+
+                elif pressed[pygame.K_RIGHT] or pressed[pygame.K_d]:
+                    self.hero_group.update('d', self.rect)
+
+                elif pressed[pygame.K_DOWN] or pressed[pygame.K_s]:
+                    self.hero_group.update('s', self.rect)
+
+                elif pressed[pygame.K_LEFT] or pressed[pygame.K_a]:
+                    self.hero_group.update('a', self.rect)
+
+                else:
+                    self.hero_group.update(None, self.rect)
+            for weapon in self.weapon_in_battle.sprites():
+                if pygame.sprite.collide_mask(weapon, self.hero):
+                    self.hp -= self.damage
+            self.draw_fight()
+            pygame.display.flip()
+            clock.tick(self.fps)
+        # if not pygame.sprite.collide_mask(self.rect_mask, self.hero):
+        #     self.rect = self.rect.move(0, 1)
+        # TODO: прямоугольник вокруг персонажа. Сердце, пересечение, функция урона
 
 
 def main_menu():
-
-    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
-    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png', 'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
+                          'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+    button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png',
+                         'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
     # button_music = Button
     main_music = pygame.mixer.Sound('data/music/main_menu/Night of Bloom.mp3')
     main_music.play(-1)
@@ -261,25 +426,34 @@ def main_menu():
 
 
 def start():
+    MainFight(load_image('fight/golem/golem.png'),
+              [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 3)], 10, 0.5)
+
     main_hero = pygame.sprite.Group()
     Hero(main_hero)
     running = True
     walls_group = pygame.sprite.Group()
-    texture_path = "walls/pixelbuildings128-v1-raw-_00044_.png"
-    walls_data = [
-        (100, 100, 50, 200),
-        (300, 50, 100, 50),
-        (500, 300, 150, 50),
-        (200, 400, 50, 150),
-    ]
+    texture_path = "1-st floor/floor.png"
+    walls_data = pygame.sprite.Group(
+        Wall(100, 100, 50, 200, texture_path, walls_group),
+        Wall(300, 50, 100, 50, texture_path, walls_group),
+        Wall(500, 300, 150, 50, texture_path, walls_group),
+        Wall(200, 400, 50, 150, texture_path, walls_group))
 
-    for wall_data in walls_data:
-        x, y, width, height = wall_data
-        Wall(x, y, width, height, texture_path, walls_group)
+    game_map = Map("main_menu/main.jpg")
+    map_width, map_height = game_map.rect.size
+    camera = Camera(1200, 630, map_width, map_height)
+
+    # for wall in walls_data:
+    #     x, y, width, height = wall
+    #     Wall(x, y, width, height, texture_path, walls_group)
 
     def draw():
-        main_hero.draw(screen)
         walls_group.draw(screen)
+        game_map.draw(camera.get_offset())  # Рисуем карту
+        for sprite in walls_group:
+            screen.blit(sprite.image, (sprite.rect.x - camera.offset_x, sprite.rect.y - camera.offset_y))
+        main_hero.draw(screen)
         cursor.draw(screen)
 
     while running:
@@ -320,6 +494,9 @@ def start():
         else:
             main_hero.update(None, walls_group)
 
+        for hero in main_hero:
+            camera.update(hero)
+
         clock.tick(fps)
         draw()
         pygame.display.flip()
@@ -330,13 +507,10 @@ if __name__ == "__main__":
     pygame.init()
     size = width, height = 1200, 630
     screen = pygame.display.set_mode(size)
-
     speed = 2
-
     fps = 60
     clock = pygame.time.Clock()
     cursor = pygame.sprite.Group()
     pygame.mouse.set_visible(False)
     Cursor(cursor)
-
     main_menu()
