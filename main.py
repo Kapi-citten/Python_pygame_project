@@ -1,6 +1,7 @@
 import pygame
 import os
 import sys
+import random
 
 
 def terminate():
@@ -58,8 +59,7 @@ class Button:
             image_path,
             hover_image_path=None,
             sound_aim=None,
-            sound_clik=None,
-            is_aim_sound=True):
+            sound_clik=None):
 
         self.x = x
         self.y = y
@@ -89,17 +89,17 @@ class Button:
         else:
             self.sound_clik = None
 
-    def draw(self, scr, mouse_pos):
+    def draw(self, mouse_pos):
 
         if self.rect.collidepoint(mouse_pos):
-            scr.blit(self.hover_image, (self.x, self.y))
+            screen.blit(self.hover_image, (self.x, self.y))
 
             if self.sound_aim and self.is_aim_sound:
                 self.sound_aim.play()
                 self.is_aim_sound = False
         else:
             self.is_aim_sound = True
-            scr.blit(self.image, (self.x, self.y))
+            screen.blit(self.image, (self.x, self.y))
 
     def event(self, mouse_pos, *event):
         if self.rect.collidepoint(mouse_pos) and event[0].button == 1:
@@ -225,6 +225,7 @@ class HeroFight(pygame.sprite.Sprite):
         if not walls.contains(self.rect):
             self.rect = old_rect
 
+
 class Map:
     def __init__(self, image_path):
         self.image = load_image(image_path)
@@ -251,12 +252,14 @@ class Camera:
         target_x = max(0, min(target_x, self.map_width - self.screen_width))
         target_y = max(0, min(target_y, self.map_height - self.screen_height))
 
-        self.offset_x += -2  # (target_x - self.offset_x) * 0.1
-        self.offset_y += -2  # (target_y - self.offset_y) * 0.1
+        self.offset_x += (target_x - self.offset_x) * 0.1
+        self.offset_y += (target_y - self.offset_y) * 0.1
 
-        # def update(self, target):
-        #     self.offset_x = max(0, min(target.rect.centerx - self.screen_width // 2, self.map_width - self.screen_width))
-        #     self.offset_y = max(0, min(target.rect.centery - self.screen_height // 2, self.map_height - self.screen_height))
+        def update(self, target):
+            self.offset_x = max(0,
+                                min(target.rect.centerx - self.screen_width // 2, self.map_width - self.screen_width))
+            self.offset_y = max(0, min(target.rect.centery - self.screen_height // 2,
+                                       self.map_height - self.screen_height))
 
         print(self.offset_y, self.offset_x)
 
@@ -294,7 +297,7 @@ class MainFight:
 
         self.image_npc = npc
         self.rect_npc = self.image_npc.get_rect()
-        self.rect_npc.center = (600, 100)
+        self.rect_npc.center = (600, 120)
 
         self.weapon = weapon_list
         self.weapon_in_battle = pygame.sprite.Group()
@@ -307,11 +310,17 @@ class MainFight:
         self.hero_hp = 50
         self.rect = pygame.Rect(100, 250, 1000, 370)
 
+        self.button_mercy = Button(50, 20, 270, 150, '', 'fight/attack_1.png', 'fight/attack_2.png',
+                                   'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+        self.button_attack = Button(850, 20, 270, 150, '', 'fight/mercy_1.png', 'fight/mercy_2.png',
+                                    'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+
         # self.mask = pygame.mask.Mask((self.rect.width, self.rect.height))
         # self.mask.fill()
 
         # self.rect_mask = pygame.mask.Mask.get_rect(width=1000, height=600, center=(10, 5))
         pygame.draw.rect(screen, 'red', self.rect, 8)
+        print(self.hp)
         self.battle_analysis()
 
     def draw_fight(self):
@@ -322,14 +331,42 @@ class MainFight:
         cursor.draw(screen)
 
     def draw(self):
-        screen.fill((0, 0, 0))
-        pygame.draw.rect(screen, 'red', self.rect, 8)
-        screen.blit(self.image_npc, self.rect_npc)
-        self.hero_group.draw(screen)
-        cursor.draw(screen)
-        #TODO: Кнопки пощады и атаки.. может быть и действия
+        while True:
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    terminate()
+                if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
+                    cursor.update(event)
+
+                if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_focused():
+                    self.button_mercy.event(pygame.mouse.get_pos(), event)
+                    self.button_attack.event(pygame.mouse.get_pos(), event)
+
+                if event.type == pygame.USEREVENT and event.button == self.button_mercy:
+                    self.start_ticks = pygame.time.get_ticks()
+                    return True
+
+                if event.type == pygame.USEREVENT and event.button == self.button_attack:
+                    self.start_ticks = pygame.time.get_ticks()
+                    self.hp -= 2
+                    print(self.hp)
+                    return True
+
+            screen.fill((0, 0, 0))
+            pygame.draw.rect(screen, 'red', self.rect, 8)
+            screen.blit(self.image_npc, self.rect_npc)
+            self.hero_group.draw(screen)
+            self.button_attack.draw(pygame.mouse.get_pos())
+            self.button_mercy.draw(pygame.mouse.get_pos())
+            cursor.draw(screen)
+            pygame.display.flip()
+
+    def new_logic(self):
+        pass
 
     def battle_analysis(self):
+        self.start_ticks = pygame.time.get_ticks()
         run = True
         while run:
 
@@ -367,18 +404,37 @@ class MainFight:
 
                 elif pressed[pygame.K_LEFT] or pressed[pygame.K_a]:
                     self.hero_group.update('a', self.rect)
-
                 else:
                     self.hero_group.update(None, self.rect)
+
+            self.new_logic()
+
             for weapon in self.weapon_in_battle.sprites():
                 if pygame.sprite.collide_mask(weapon, self.hero):
-                    self.hp -= self.damage
-            self.draw_fight()
+                    self.hero_hp -= self.damage
+
+            if (pygame.time.get_ticks() - self.start_ticks) / 1000 > 5:
+                self.draw()
+
+            else:
+                self.draw_fight()
             pygame.display.flip()
             clock.tick(self.fps)
         # if not pygame.sprite.collide_mask(self.rect_mask, self.hero):
         #     self.rect = self.rect.move(0, 1)
-        # TODO: прямоугольник вокруг персонажа. Сердце, пересечение, функция урона
+
+
+# class Golem(MainFight):
+#     def __init__(self,  npc, weapon_list, hp, damage):
+#         super().__init__(npc, weapon_list, hp, damage)
+#         class Stone(pygame.sprite.Sprite):
+#             def __init__(self, group):
+#                 super().__init__(group)
+#                 self.image = weapon_list[random.randint(0, 2)]
+#                 self.rect = self.image.get_rect()
+#                 self.rect.x = random.randint()
+#                 self.rect.y = random.randint()
+#             def new_logic(self):
 
 
 def main_menu():
@@ -396,8 +452,8 @@ def main_menu():
 
     def draw():
         screen.blit(background, (0, 0))
-        button_exit.draw(screen, pygame.mouse.get_pos())
-        button_start.draw(screen, pygame.mouse.get_pos())
+        button_exit.draw(pygame.mouse.get_pos())
+        button_start.draw(pygame.mouse.get_pos())
         cursor.draw(screen)
 
     while running:
