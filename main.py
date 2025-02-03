@@ -267,39 +267,42 @@ class Camera:
         return [self.offset_x, self.offset_y]
 
 
-# class Dialog:
-#     # TODO: базовое окно для диалога со всеми отдельными персонажами
-#     def __init__(self, scp_text_list, hero_text_list, npc_img_list, hero_img_list, x=0, y=600, width=1200,
-#                  height=100, color='blue'):
-#         self.x = x
-#         self.y = y
-#         self.width = width
-#         self.height = height
-#         self.scp_text = scp_text_list
-#         self.hero_text = hero_text_list
-#         self.rect = pygame.Rect(x, y, width, height)
-#         self.color = color
-#
-#         self.image_npc = [load_image(npc_img_list[i]) for i in range(len(npc_img_list))]
-#         self.image_hero = [load_image(hero_img_list[i]) for i in range(len(hero_img_list))]
-#
-#         self.image = pygame.transform.scale(self.image, (width, height))
-#
-#         self.rect = self.image.get_rect(topleft=(x, y))
-#
-#     def dialog(self):
-#         screen.fill(pygame.Color(self.color), self.rect)
+class Dialog:
+    # TODO: базовое окно для диалога со всеми отдельными персонажами
+    def __init__(self, scp_text_list, hero_text_list, npc_img_list, hero_img_list, x=0, y=600, width=1200,
+                 height=100, color='blue'):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.scp_text = scp_text_list
+        self.hero_text = hero_text_list
+        self.rect = pygame.Rect(x, y, width, height)
+        self.color = color
+
+        self.image_npc = [load_image(npc_img_list[i]) for i in range(len(npc_img_list))]
+        self.image_hero = [load_image(hero_img_list[i]) for i in range(len(hero_img_list))]
+
+        self.image = pygame.transform.scale(self.image, (width, height))
+
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def dialog(self):
+        screen.fill(pygame.Color(self.color), self.rect)
+
 
 class MainFight:
-    def __init__(self, npc, weapon_list, hp, damage):
+    def __init__(self, npc, hp, weapon, damage):
         screen.fill((0, 0, 0))
         self.fps = 170
 
+        self.mercy = True
         self.image_npc = npc
         self.rect_npc = self.image_npc.get_rect()
         self.rect_npc.center = (600, 120)
+        self.n = 1
 
-        self.weapon = weapon_list
+        self.weapon = weapon
         self.weapon_in_battle = pygame.sprite.Group()
         self.hp = hp
         self.damage = damage
@@ -310,9 +313,9 @@ class MainFight:
         self.hero_hp = 50
         self.rect = pygame.Rect(100, 250, 1000, 370)
 
-        self.button_mercy = Button(50, 20, 270, 150, '', 'fight/attack_1.png', 'fight/attack_2.png',
+        self.button_attack = Button(50, 20, 270, 150, '', 'fight/attack_1.png', 'fight/attack_2.png',
                                    'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
-        self.button_attack = Button(850, 20, 270, 150, '', 'fight/mercy_1.png', 'fight/mercy_2.png',
+        self.button_mercy = Button(850, 20, 270, 150, '', 'fight/mercy_1.png', 'fight/mercy_2.png',
                                     'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
 
         # self.mask = pygame.mask.Mask((self.rect.width, self.rect.height))
@@ -320,7 +323,10 @@ class MainFight:
 
         # self.rect_mask = pygame.mask.Mask.get_rect(width=1000, height=600, center=(10, 5))
         pygame.draw.rect(screen, 'red', self.rect, 8)
-        print(self.hp)
+        self.start_ticks = pygame.time.get_ticks()
+
+        self.timer = 0.3
+        self.weapon = weapon
         self.battle_analysis()
 
     def draw_fight(self):
@@ -328,10 +334,13 @@ class MainFight:
         pygame.draw.rect(screen, 'red', self.rect, 8)
         screen.blit(self.image_npc, self.rect_npc)
         self.hero_group.draw(screen)
+        self.weapon_in_battle.draw(screen)
         cursor.draw(screen)
 
     def draw(self):
-        while True:
+        self.weapon_in_battle = pygame.sprite.Group()
+        t = True
+        while t:
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -345,14 +354,25 @@ class MainFight:
 
                 if event.type == pygame.USEREVENT and event.button == self.button_mercy:
                     self.start_ticks = pygame.time.get_ticks()
-                    return True
+
+                    if not self.mercy:
+                        self.n = 2
+                        self.mercy = False
+                    else:
+                        self.n += 1
+                    t = False
 
                 if event.type == pygame.USEREVENT and event.button == self.button_attack:
                     self.start_ticks = pygame.time.get_ticks()
+                    self.n += 1
                     self.hp -= 2
                     print(self.hp)
-                    return True
-
+                    if self.mercy:
+                        self.n = 2
+                        self.mercy = False
+                    else:
+                        self.n += 1
+                    t = False
             screen.fill((0, 0, 0))
             pygame.draw.rect(screen, 'red', self.rect, 8)
             screen.blit(self.image_npc, self.rect_npc)
@@ -361,12 +381,11 @@ class MainFight:
             self.button_mercy.draw(pygame.mouse.get_pos())
             cursor.draw(screen)
             pygame.display.flip()
-
+        self.timer = 0.3
     def new_logic(self):
         pass
 
     def battle_analysis(self):
-        self.start_ticks = pygame.time.get_ticks()
         run = True
         while run:
 
@@ -412,8 +431,9 @@ class MainFight:
             for weapon in self.weapon_in_battle.sprites():
                 if pygame.sprite.collide_mask(weapon, self.hero):
                     self.hero_hp -= self.damage
+                    print(self.hero_hp)
 
-            if (pygame.time.get_ticks() - self.start_ticks) / 1000 > 5:
+            if (pygame.time.get_ticks() - self.start_ticks) / 1000 > 10:
                 self.draw()
 
             else:
@@ -424,21 +444,52 @@ class MainFight:
         #     self.rect = self.rect.move(0, 1)
 
 
-# class Golem(MainFight):
-#     def __init__(self,  npc, weapon_list, hp, damage):
-#         super().__init__(npc, weapon_list, hp, damage)
-#         class Stone(pygame.sprite.Sprite):
-#             def __init__(self, group):
-#                 super().__init__(group)
-#                 self.image = weapon_list[random.randint(0, 2)]
-#                 self.rect = self.image.get_rect()
-#                 self.rect.x = random.randint()
-#                 self.rect.y = random.randint()
-#             def new_logic(self):
+class Golem(MainFight):
+    def __init__(self,  npc, hp, weapon, damage):
+        super().__init__(npc, hp, weapon, damage)
+
+
+    class Stone(pygame.sprite.Sprite):
+        def __init__(self, group, weapon, phase):
+            super().__init__(group)
+            self.image = weapon[random.randint(0, 2)]
+            self.mask = pygame.mask.from_surface(self.image)
+            self.rect = self.image.get_rect()
+            if phase == 1:
+                self.rect.x = random.randint(200, 1000)
+                self.rect.y = 0
+
+            elif phase == 2:
+                self.rect.x = 0
+                self.rect.y = random.randint(200, 600)
+            else:
+                self.rect.x = 350
+                self.rect.y = 360
+            self.phase = phase
+        def update(self):
+            if self.phase == 1:
+                self.rect.y += 4
+
+            elif self.phase == 2:
+                self.rect.x += 4
+
+    def new_logic(self):
+        if self.n == 4:
+            self.timer = 0.3
+
+        else:
+            if (pygame.time.get_ticks() - self.start_ticks) / 1000 >= self.timer:
+                print('ok')
+                self.timer += 0.3
+                print(self.timer)
+                self.Stone(self.weapon_in_battle, self.weapon, self.n)
+
+        self.weapon_in_battle.update()
+
 
 
 def main_menu():
-    button_start = Button(width / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
+    button_start = Button(WIDTH / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
                           'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
     button_exit = Button(900, 500, 300, 120, '', 'main_menu/exit_1.png', 'main_menu/exit_2.png',
                          'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
@@ -482,8 +533,8 @@ def main_menu():
 
 
 def start():
-    MainFight(load_image('fight/golem/golem.png'),
-              [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 3)], 10, 0.5)
+    Golem(load_image('fight/golem/golem.png'),
+              10, [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 4)], 0.5)
 
     main_hero = pygame.sprite.Group()
     Hero(main_hero)
@@ -561,7 +612,7 @@ def start():
 
 if __name__ == "__main__":
     pygame.init()
-    size = width, height = 1200, 630
+    size = WIDTH, HEIGHT = 1200, 630
     screen = pygame.display.set_mode(size)
     speed = 2
     fps = 60
