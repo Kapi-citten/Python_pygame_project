@@ -225,48 +225,6 @@ class HeroFight(pygame.sprite.Sprite):
         if not walls.contains(self.rect):
             self.rect = old_rect
 
-
-class Map:
-    def __init__(self, image_path):
-        self.image = load_image(image_path)
-        self.rect = self.image.get_rect()
-
-    def draw(self, camera_offset):
-        # Рисуем карту с учётом сдвига камеры
-        screen.blit(self.image, (-camera_offset[0], -camera_offset[1]))
-
-
-class Camera:
-    def __init__(self, screen_width, screen_height, map_width, map_height):
-        self.offset_x = 0
-        self.offset_y = 0
-        self.screen_width = screen_width
-        self.screen_height = screen_height
-        self.map_width = map_width
-        self.map_height = map_height
-
-    def update(self, target):
-        target_x = target.rect.centerx - self.screen_width // 2
-        target_y = target.rect.centery - self.screen_height // 2
-
-        target_x = max(0, min(target_x, self.map_width - self.screen_width))
-        target_y = max(0, min(target_y, self.map_height - self.screen_height))
-
-        self.offset_x += (target_x - self.offset_x) * 0.1
-        self.offset_y += (target_y - self.offset_y) * 0.1
-
-        def update(self, target):
-            self.offset_x = max(0,
-                                min(target.rect.centerx - self.screen_width // 2, self.map_width - self.screen_width))
-            self.offset_y = max(0, min(target.rect.centery - self.screen_height // 2,
-                                       self.map_height - self.screen_height))
-
-        print(self.offset_y, self.offset_x)
-
-    def get_offset(self):
-        return [self.offset_x, self.offset_y]
-
-
 class Dialog:
     # TODO: базовое окно для диалога со всеми отдельными персонажами
     def __init__(self, scp_text_list, hero_text_list, npc_img_list, hero_img_list, x=0, y=600, width=1200,
@@ -289,7 +247,6 @@ class Dialog:
 
     def dialog(self):
         screen.fill(pygame.Color(self.color), self.rect)
-
 
 class MainFight:
     def __init__(self, npc, hp, weapon, damage):
@@ -364,7 +321,6 @@ class MainFight:
 
                 if event.type == pygame.USEREVENT and event.button == self.button_attack:
                     self.start_ticks = pygame.time.get_ticks()
-                    self.n += 1
                     self.hp -= 2
                     print(self.hp)
                     if self.mercy:
@@ -386,6 +342,7 @@ class MainFight:
         pass
 
     def battle_analysis(self):
+        self.start_ticks = pygame.time.get_ticks()
         run = True
         while run:
 
@@ -431,7 +388,6 @@ class MainFight:
             for weapon in self.weapon_in_battle.sprites():
                 if pygame.sprite.collide_mask(weapon, self.hero):
                     self.hero_hp -= self.damage
-                    print(self.hero_hp)
 
             if (pygame.time.get_ticks() - self.start_ticks) / 1000 > 10:
                 self.draw()
@@ -488,6 +444,27 @@ class Golem(MainFight):
 
 
 
+class Camera:
+    def __init__(self, width, height):
+        self.camera = pygame.Rect(0, 0, width, height)
+        self.width = width
+        self.height = height
+
+    def apply(self, entity):
+        return entity.rect.move(self.camera.topleft)
+
+    def update(self, target):
+        x = -target.rect.centerx + int(self.width / 2)
+        y = -target.rect.centery + int(self.height / 2)
+
+        x = min(0, x)
+        y = min(0, y)
+        x = max(-(self.width - screen.get_width()), x)
+        y = max(-(self.height - screen.get_height()), y)
+
+        self.camera = pygame.Rect(x, y, self.width, self.height)
+
+
 def main_menu():
     button_start = Button(WIDTH / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
                           'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
@@ -537,7 +514,7 @@ def start():
               10, [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 4)], 0.5)
 
     main_hero = pygame.sprite.Group()
-    Hero(main_hero)
+    hero = Hero(main_hero)
     running = True
     walls_group = pygame.sprite.Group()
     texture_path = "1-st floor/floor.png"
@@ -547,20 +524,17 @@ def start():
         Wall(500, 300, 150, 50, texture_path, walls_group),
         Wall(200, 400, 50, 150, texture_path, walls_group))
 
-    game_map = Map("main_menu/main.jpg")
-    map_width, map_height = game_map.rect.size
-    camera = Camera(1200, 630, map_width, map_height)
-
     # for wall in walls_data:
     #     x, y, width, height = wall
     #     Wall(x, y, width, height, texture_path, walls_group)
 
+    camera = Camera(1000, 1000)
+
     def draw():
-        walls_group.draw(screen)
-        game_map.draw(camera.get_offset())  # Рисуем карту
         for sprite in walls_group:
-            screen.blit(sprite.image, (sprite.rect.x - camera.offset_x, sprite.rect.y - camera.offset_y))
-        main_hero.draw(screen)
+            screen.blit(sprite.image, camera.apply(sprite))
+        for sprite in main_hero:
+            screen.blit(sprite.image, camera.apply(sprite))
         cursor.draw(screen)
 
     while running:
@@ -601,9 +575,7 @@ def start():
         else:
             main_hero.update(None, walls_group)
 
-        for hero in main_hero:
-            camera.update(hero)
-
+        camera.update(hero)
         clock.tick(fps)
         draw()
         pygame.display.flip()
