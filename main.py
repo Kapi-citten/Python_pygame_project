@@ -25,6 +25,7 @@ def load_image(name, color_key=None):
     return image
 
 
+
 def main_menu():
     button_start = Button(WIDTH / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
                           'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
@@ -88,7 +89,7 @@ def start():
     #     x, y, width, height = wall
     #     Wall(x, y, width, height, texture_path, walls_group)
 
-    camera = Camera(1500, 1500)
+    camera = Camera(2000, 1000)
 
     def draw():
         for sprite in walls_group:
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     from app.fighting.main_fighters import Golem
     from app.system import Button, Cursor, Camera
     from app.world import Wall, Door, Dialog
+    Cursor(CURSOR)
     pygame.init()
     pygame.mouse.set_visible(False)
-    Cursor(CURSOR)
     main_menu()
