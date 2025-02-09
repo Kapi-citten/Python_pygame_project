@@ -108,6 +108,7 @@ def start():
         Wall(300, 50, 100, 50, texture_path, walls_group),
         Wall(500, 300, 150, 50, texture_path, walls_group),
         Wall(200, 400, 50, 150, texture_path, walls_group))
+
     # for wall in walls_data:
     #     x, y, width, height = wall
     #     Wall(x, y, width, height, texture_path, walls_group)
