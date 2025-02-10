@@ -2,13 +2,6 @@ import pygame
 import os
 import sys
 
-SPEED = 2
-FPS = 60
-SIZE = WIDTH, HEIGHT = 1200, 630
-SCREEN = pygame.display.set_mode(SIZE)
-CLOCK = pygame.time.Clock()
-CURSOR = pygame.sprite.Group()
-
 
 def terminate():
     pygame.quit()
@@ -25,6 +18,32 @@ def load_image(name, color_key=None):
     return image
 
 
+class Cursor(pygame.sprite.Sprite):
+    cat_cursor = load_image('cursor/Cat_cursor.png')
+
+    def __init__(self, group):
+        super().__init__(group)
+        self.image = Cursor.cat_cursor
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+
+    def update(self, *args):
+        cord = args[0].pos
+        self.rect.x = cord[0]
+        self.rect.y = cord[1]
+
+
+SPEED = 2
+FPS = 60
+SIZE = WIDTH, HEIGHT = 1200, 630
+SCREEN = pygame.display.set_mode(SIZE)
+CLOCK = pygame.time.Clock()
+CURSOR = pygame.sprite.Group()
+pygame.init()
+pygame.mouse.set_visible(False)
+Cursor(CURSOR)
+
 
 def main_menu():
     button_start = Button(WIDTH / 2 - (370 / 2), 70, 370, 150, '', 'main_menu/new_1.png', 'main_menu/new_2.png',
@@ -34,6 +53,7 @@ def main_menu():
     # button_music = Button
     main_music = pygame.mixer.Sound('data/music/main_menu/Night of Bloom.mp3')
     main_music.play(-1)
+    main_music.set_volume(0.4)
 
     running = True
     new = False
@@ -72,7 +92,13 @@ def main_menu():
 
 def start():
     # Golem(load_image('fight/golem/golem.png'),
-    #           10, [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 4)], 0.5)
+    #        10, 0.5)
+
+    Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
+
+    main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
+    main_music.play(-1)
+    main_music.set_volume(0.8)
 
     main_hero = pygame.sprite.Group()
     hero = Hero(main_hero)
@@ -115,9 +141,10 @@ def start():
     #     x, y, width, height = wall
     #     Wall(x, y, width, height, texture_path, walls_group)
 
-    camera = Camera(2000, 1000)
+    camera = Camera(1500, 1000)
 
     def draw():
+        SCREEN.fill((0, 0, 0))
         for sprite in walls_group:
             SCREEN.blit(sprite.image, camera.apply(sprite))
         for sprite in main_hero:
@@ -125,13 +152,17 @@ def start():
         CURSOR.draw(SCREEN)
 
     while running:
-        SCREEN.fill((0, 0, 0))
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
                 CURSOR.update(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_focused():
+                Dialog(['Похоже Капи сделал диалоги...', 'Я не очень понимаю зачем он себя так "убивает"', 'Мне его жалко...', 'Эй, не беспокойся, с ним всё будет хорошо.'],
+                       ['dialog/Ann/meow.png', 'dialog/Ann/angru_sad.png'],
+                       ['dialog/main_hero/perplexed.png', 'dialog/main_hero/cute_1.png']).dialog(draw)
 
         pressed = pygame.key.get_pressed()
 
@@ -172,10 +203,8 @@ def start():
 if __name__ == "__main__":
     from app.hero import Hero, HeroFight
     from app.fighting.fighting_systems import MainFight
-    from app.fighting.main_fighters import Golem
-    from app.system import Button, Cursor, Camera
+    from app.fighting.main_fighters import Golem, Kasumi
+    from app.system import Button, Camera
     from app.world import Wall, Door, Dialog
-    Cursor(CURSOR)
-    pygame.init()
-    pygame.mouse.set_visible(False)
+
     main_menu()

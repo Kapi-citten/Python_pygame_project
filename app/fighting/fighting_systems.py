@@ -3,7 +3,7 @@ from main import SCREEN, CURSOR, CLOCK, pygame, terminate
 from app.system import Button
 
 class MainFight:
-    def __init__(self, npc, hp, weapon, damage):
+    def __init__(self, npc, hp, damage):
         SCREEN.fill((0, 0, 0))
         self.fps = 170
 
@@ -13,7 +13,6 @@ class MainFight:
         self.rect_npc.center = (600, 120)
         self.n = 1
 
-        self.weapon = weapon
         self.weapon_in_battle = pygame.sprite.Group()
         self.hp = hp
         self.damage = damage
@@ -21,12 +20,12 @@ class MainFight:
         self.hero_group = pygame.sprite.Group()
         HeroFight(self.hero_group)
         self.hero = self.hero_group.sprites()[0]
-        self.hero_hp = 50
+        self.hero_hp = 200
         self.rect = pygame.Rect(100, 250, 1000, 370)
-
-        self.button_attack = Button(50, 20, 270, 150, '', 'fight/attack_1.png', 'fight/attack_2.png',
+        self.time = 4
+        self.button_attack = Button(50, 20, 305, 150, '', 'fight/attack_1.png', 'fight/attack_2.png',
                                    'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
-        self.button_mercy = Button(850, 20, 270, 150, '', 'fight/mercy_1.png', 'fight/mercy_2.png',
+        self.button_mercy = Button(850, 20, 305, 150, '', 'fight/mercy_1.png', 'fight/mercy_2.png',
                                     'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
 
         # self.mask = pygame.mask.Mask((self.rect.width, self.rect.height))
@@ -36,8 +35,7 @@ class MainFight:
         pygame.draw.rect(SCREEN, 'red', self.rect, 8)
         self.start_ticks = pygame.time.get_ticks()
 
-        self.timer = 0.3
-        self.weapon = weapon
+        self.timer = 0.5
         self.battle_analysis()
 
     def draw_fight(self):
@@ -64,24 +62,23 @@ class MainFight:
                     self.button_attack.event(pygame.mouse.get_pos(), event)
 
                 if event.type == pygame.USEREVENT and event.button == self.button_mercy:
-                    self.start_ticks = pygame.time.get_ticks()
 
-                    if not self.mercy:
-                        self.n = 2
-                        self.mercy = False
-                    else:
+                    if not self.n >= 5:
                         self.n += 1
+                        self.mercy = True
+                    else:
+                        self.mercy_end()
+                        return True
                     t = False
 
+
                 if event.type == pygame.USEREVENT and event.button == self.button_attack:
-                    self.start_ticks = pygame.time.get_ticks()
-                    self.hp -= 2
-                    print(self.hp)
-                    if self.mercy:
-                        self.n = 2
-                        self.mercy = False
-                    else:
-                        self.n += 1
+                    self.hp -= 3
+                    self.n += 1
+                    self.mercy = False
+                    if self.hp <= 0:
+                        self.killer_end()
+                        return True
                     t = False
             SCREEN.fill((0, 0, 0))
             pygame.draw.rect(SCREEN, 'red', self.rect, 8)
@@ -91,10 +88,13 @@ class MainFight:
             self.button_mercy.draw(pygame.mouse.get_pos())
             CURSOR.draw(SCREEN)
             pygame.display.flip()
-        self.timer = 0.3
+        self.timer_apdate()
+        self.start_ticks = pygame.time.get_ticks()
     def new_logic(self):
         pass
 
+    def timer_apdate(self):
+        pass
     def battle_analysis(self):
         self.start_ticks = pygame.time.get_ticks()
         run = True
@@ -143,12 +143,27 @@ class MainFight:
                 if pygame.sprite.collide_mask(weapon, self.hero):
                     self.hero_hp -= self.damage
 
-            if (pygame.time.get_ticks() - self.start_ticks) / 1000 > 10:
-                self.draw()
+            if (pygame.time.get_ticks() - self.start_ticks) / 1000 > self.time:
+                if self.draw():
+                    self.main_music.stop()
+                    return
 
             else:
                 self.draw_fight()
             pygame.display.flip()
             CLOCK.tick(self.fps)
+
+            if self.hero_hp <= 0:
+                run = True
+                while run:
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            terminate()
+    def mercy_end(self):
+        pass
+
+    def killer_end(self):
+        pass
         # if not pygame.sprite.collide_mask(self.rect_mask, self.hero):
         #     self.rect = self.rect.move(0, 1)

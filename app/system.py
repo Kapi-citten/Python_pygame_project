@@ -1,6 +1,7 @@
 import pygame
 from main import load_image, SCREEN
 
+
 class Button:
     def __init__(
             self,
@@ -59,22 +60,6 @@ class Button:
             if self.sound_clik:
                 self.sound_clik.play()
             pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
-
-
-class Cursor(pygame.sprite.Sprite):
-    cat_cursor = load_image("cursor/Cat_cursor.png")
-
-    def __init__(self, group):
-        super().__init__(group)
-        self.image = Cursor.cat_cursor
-        self.rect = self.image.get_rect()
-        self.rect.x = 0
-        self.rect.y = 0
-
-    def update(self, *args):
-        cord = args[0].pos
-        self.rect.x = cord[0]
-        self.rect.y = cord[1]
 
 
 class Camera:
