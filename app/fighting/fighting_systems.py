@@ -3,7 +3,7 @@ from main import SCREEN, CURSOR, CLOCK, pygame, terminate
 from app.system import Button
 
 class MainFight:
-    def __init__(self, npc, hp, weapon, damage):
+    def __init__(self, npc, hp, damage):
         SCREEN.fill((0, 0, 0))
         self.fps = 170
 
@@ -13,7 +13,6 @@ class MainFight:
         self.rect_npc.center = (600, 120)
         self.n = 1
 
-        self.weapon = weapon
         self.weapon_in_battle = pygame.sprite.Group()
         self.hp = hp
         self.damage = damage
@@ -37,7 +36,6 @@ class MainFight:
         self.start_ticks = pygame.time.get_ticks()
 
         self.timer = 0.5
-        self.weapon = weapon
         self.battle_analysis()
 
     def draw_fight(self):
@@ -147,6 +145,7 @@ class MainFight:
 
             if (pygame.time.get_ticks() - self.start_ticks) / 1000 > self.time:
                 if self.draw():
+                    self.main_music.stop()
                     return
 
             else:

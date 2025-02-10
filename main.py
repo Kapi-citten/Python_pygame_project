@@ -19,7 +19,7 @@ def load_image(name, color_key=None):
 
 
 class Cursor(pygame.sprite.Sprite):
-    cat_cursor = load_image("cursor/Cat_cursor.png")
+    cat_cursor = load_image('cursor/Cat_cursor.png')
 
     def __init__(self, group):
         super().__init__(group)
@@ -91,8 +91,10 @@ def main_menu():
 
 
 def start():
-    Golem(load_image('fight/golem/golem.png'),
-           10, [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 4)], 0.5)
+    # Golem(load_image('fight/golem/golem.png'),
+    #        10, 0.5)
+
+    Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
 
     main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
     main_music.play(-1)
@@ -175,7 +177,7 @@ def start():
 if __name__ == "__main__":
     from app.hero import Hero, HeroFight
     from app.fighting.fighting_systems import MainFight
-    from app.fighting.main_fighters import Golem
+    from app.fighting.main_fighters import Golem, Kasumi
     from app.system import Button, Camera
     from app.world import Wall, Door, Dialog
 
