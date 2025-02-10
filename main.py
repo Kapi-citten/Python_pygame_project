@@ -80,10 +80,36 @@ def start():
     walls_group = pygame.sprite.Group()
     texture_path = "1-st floor/floor.png"
     walls_data = pygame.sprite.Group(
-        Wall(100, 100, 50, 200, texture_path, walls_group),
-        Wall(300, 50, 100, 50, texture_path, walls_group),
-        Wall(500, 300, 150, 50, texture_path, walls_group),
-        Wall(200, 400, 50, 150, texture_path, walls_group))
+        Wall(665, 236, 582, 17, texture_path, walls_group),
+        Wall(689, 114, 23, 120, texture_path, walls_group),
+        Wall(410, 131, 372, 17, texture_path, walls_group),
+        Wall(248, 128, 360, 14, texture_path, walls_group),
+        Wall(608, 241, 21, 109, texture_path, walls_group),
+        Wall(665, 260, 329, 18, texture_path, walls_group),
+        Wall(651, 446, 11, 285, texture_path, walls_group),
+        Wall(357, 429, 291, 18, texture_path, walls_group),
+        Wall(771, 443, 705, 12, texture_path, walls_group),
+        Wall(456, 443, 134, 12, texture_path, walls_group),
+        Wall(153, 444, 19, 306, texture_path, walls_group),
+        Wall(156, 444, 559, 12, texture_path, walls_group),
+        Wall(394, 270, 29, 134, texture_path, walls_group),
+        Wall(367, 347, 29, 84, texture_path, walls_group),
+        Wall(503, 277, 17, 115, texture_path, walls_group),
+        Wall(482, 350, 24, 80, texture_path, walls_group),
+        Wall(801, 594, 28, 593, texture_path, walls_group),
+        Wall(799, 598, 27, 554, texture_path, walls_group),
+        Wall(796, 603, 21, 409, texture_path, walls_group),
+        Wall(1, 599, 774, 20, texture_path, walls_group),
+        Wall(0, 598, 750, 18, texture_path, walls_group),
+        Wall(-1, 596, 752, 15, texture_path, walls_group),
+        Wall(-4, 598, 328, 18, texture_path, walls_group),
+        Wall(-2, 2, 20, 578, texture_path, walls_group),
+        Wall(0, -1, 18, 554, texture_path, walls_group),
+        Wall(2, 2, 17, 401, texture_path, walls_group),
+        Wall(773, 14, 754, 11, texture_path, walls_group),
+        Wall(745, 14, 722, 11, texture_path, walls_group),
+        Wall(759, 17, 714, 14, texture_path, walls_group),
+        Wall(769, 23, 383, 19, texture_path, walls_group),)
 
     # for wall in walls_data:
     #     x, y, width, height = wall
