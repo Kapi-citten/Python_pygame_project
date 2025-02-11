@@ -38,12 +38,27 @@ class MainFight:
         self.timer = 0.5
         self.battle_analysis()
 
+    def draw_health_bar(self):
+        hero_bar_width = 300
+        hero_bar_height = 20
+        hero_bar_x = 50
+        hero_bar_y = 50  
+        max_hp = 200
+        hero_health_ratio = self.hero_hp / max_hp
+
+        pygame.draw.rect(SCREEN, (255, 0, 0), (hero_bar_x, hero_bar_y, hero_bar_width, hero_bar_height))
+        pygame.draw.rect(SCREEN, (0, 255, 0), (hero_bar_x, hero_bar_y, hero_bar_width * hero_health_ratio, hero_bar_height))
+        pygame.draw.rect(SCREEN, (255, 255, 255), (hero_bar_x, hero_bar_y, hero_bar_width, hero_bar_height), 2)
+
+
+
     def draw_fight(self):
         SCREEN.fill((0, 0, 0))
         pygame.draw.rect(SCREEN, 'red', self.rect, 8)
         SCREEN.blit(self.image_npc, self.rect_npc)
         self.hero_group.draw(SCREEN)
         self.weapon_in_battle.draw(SCREEN)
+        self.draw_health_bar()
         CURSOR.draw(SCREEN)
 
     def draw(self):
@@ -145,7 +160,7 @@ class MainFight:
 
             if (pygame.time.get_ticks() - self.start_ticks) / 1000 > self.time:
                 if self.draw():
-                    self.main_music.stop()
+                    # self.main_music.stop()
                     return
 
             else:
