@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 
 # Загружаем изображение
-img = cv2.imread("wallpaper3.png")
+img = cv2.imread("data/image/world/map.png")
 img_h, img_w = img.shape[:2]  # Размеры оригинального изображения
 
 # Размер окна просмотра
-win_h, win_w = 600, 800  # Настроить под экран
+win_h, win_w = 1000, 1800  # Настроить под экран
 scroll_y, scroll_x = 0, 0  # Смещение
 step = 50  # Шаг прокрутки
 
@@ -34,27 +34,25 @@ def draw_rectangle(event, x, y, flags, param):
     elif event == cv2.EVENT_LBUTTONUP:  # Завершение рисования
         drawing = False
         end_point = (real_x, real_y)
-        width, height = abs(end_point[0] - start_point[0]), abs(end_point[1] - start_point[1])
+        x1, y1 = min(start_point[0], end_point[0]), min(start_point[1], end_point[1])
+        x2, y2 = max(start_point[0], end_point[0]), max(start_point[1], end_point[1])
+        width, height = x2 - x1, y2 - y1
 
-        rectangles.append((start_point, end_point, width, height))
-        print(f"Wall({x}, {y}, {width}, {height}, texture_path, walls_group),")
+        rectangles.append((x1, y1, width, height))
 
-        cv2.rectangle(img, start_point, end_point, (0, 255, 0), 2)
+        # Вывод корректного кода для Pygame
+        print(f"Wall({x1}, {y1}, {width}, {height}, texture_path, walls_group),")
+
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
         show_image(img)
 
 def scroll(event, x, y, flags, param):
     global scroll_y, scroll_x
     if event == cv2.EVENT_MOUSEWHEEL:
         if flags > 0:  # Колесо вверх
-            if cv2.waitKey(1) & 0xFF == ord("s"):  # Shift + колесо = горизонтальная прокрутка
-                scroll_x = max(0, scroll_x - step)
-            else:
-                scroll_y = max(0, scroll_y - step)
+            scroll_y = max(0, scroll_y - step)
         else:  # Колесо вниз
-            if cv2.waitKey(1) & 0xFF == ord("s"):  # Shift + колесо = горизонтальная прокрутка
-                scroll_x = min(img_w - win_w, scroll_x + step)
-            else:
-                scroll_y = min(img_h - win_h, scroll_y + step)
+            scroll_y = min(img_h - win_h, scroll_y + step)
         show_image(img)
 
 def show_image(image):

@@ -4,16 +4,17 @@ from main import load_image, SCREEN
 
 class Button:
     def __init__(
-            self,
-            x,
-            y,
-            width,
-            height,
-            text,
-            image_path,
-            hover_image_path=None,
-            sound_aim=None,
-            sound_clik=None):
+        self,
+        x,
+        y,
+        width,
+        height,
+        text,
+        image_path,
+        hover_image_path=None,
+        sound_aim=None,
+        sound_clik=None,
+    ):
 
         self.x = x
         self.y = y
@@ -63,21 +64,28 @@ class Button:
 
 
 class Camera:
-    def __init__(self, width, height):
-        self.camera = pygame.Rect(0, 0, width, height)
-        self.width = width
-        self.height = height
+    def __init__(self, screen_width, screen_height):
+        self.offset_x = 0
+        self.offset_y = 0
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
-    def apply(self, entity):
-        return entity.rect.move(self.camera.topleft)
+    def update(self, target, map_width, map_height):
+        x = target.rect.centerx - self.screen_width // 2
+        y = target.rect.centery - self.screen_height // 2
 
-    def update(self, target):
-        x = -target.rect.centerx + int(self.width / 2)
-        y = -target.rect.centery + int(self.height / 2)
+        x = max(0, min(x, map_width - self.screen_width))
+        y = max(0, min(y, map_height - self.screen_height))
+        self.offset_x = x
+        self.offset_y = y
 
-        x = min(0, x)
-        y = min(0, y)
-        x = max(-(self.width - SCREEN.get_width()), x)
-        y = max(-(self.height - SCREEN.get_height()), y)
+    def apply(self, obj):
+        if hasattr(obj, 'rect'):
+            return obj.rect.move(-self.offset_x, -self.offset_y)
+        elif isinstance(obj, pygame.Rect):
+            return obj.move(-self.offset_x, -self.offset_y)
+        else:
+            raise TypeError("apply: объект не имеет атрибута rect")
 
-        self.camera = pygame.Rect(x, y, self.width, self.height)
+    def apply_rect(self, rect):
+        return rect.move(-self.offset_x, -self.offset_y)

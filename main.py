@@ -94,7 +94,7 @@ def start():
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
 
-    Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
+    # Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
 
     main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
     main_music.play(-1)
@@ -104,47 +104,21 @@ def start():
     hero = Hero(main_hero)
     running = True
     walls_group = pygame.sprite.Group()
-    texture_path = "1-st floor/floor.png"
+    map_image = load_image('world/map.png')
+    map_image = pygame.transform.scale(map_image, (2624, 1554))
+    texture_path = "world/wall.png"
     walls_data = pygame.sprite.Group(
-        Wall(665, 236, 582, 17, texture_path, walls_group),
-        Wall(689, 114, 23, 120, texture_path, walls_group),
-        Wall(410, 131, 372, 17, texture_path, walls_group),
-        Wall(248, 128, 360, 14, texture_path, walls_group),
-        Wall(608, 241, 21, 109, texture_path, walls_group),
-        Wall(665, 260, 329, 18, texture_path, walls_group),
-        Wall(651, 446, 11, 285, texture_path, walls_group),
-        Wall(357, 429, 291, 18, texture_path, walls_group),
-        Wall(771, 443, 705, 12, texture_path, walls_group),
-        Wall(456, 443, 134, 12, texture_path, walls_group),
-        Wall(153, 444, 19, 306, texture_path, walls_group),
-        Wall(156, 444, 559, 12, texture_path, walls_group),
-        Wall(394, 270, 29, 134, texture_path, walls_group),
-        Wall(367, 347, 29, 84, texture_path, walls_group),
-        Wall(503, 277, 17, 115, texture_path, walls_group),
-        Wall(482, 350, 24, 80, texture_path, walls_group),
-        Wall(801, 594, 28, 593, texture_path, walls_group),
-        Wall(799, 598, 27, 554, texture_path, walls_group),
-        Wall(796, 603, 21, 409, texture_path, walls_group),
-        Wall(1, 599, 774, 20, texture_path, walls_group),
-        Wall(0, 598, 750, 18, texture_path, walls_group),
-        Wall(-1, 596, 752, 15, texture_path, walls_group),
-        Wall(-4, 598, 328, 18, texture_path, walls_group),
-        Wall(-2, 2, 20, 578, texture_path, walls_group),
-        Wall(0, -1, 18, 554, texture_path, walls_group),
-        Wall(2, 2, 17, 401, texture_path, walls_group),
-        Wall(773, 14, 754, 11, texture_path, walls_group),
-        Wall(745, 14, 722, 11, texture_path, walls_group),
-        Wall(759, 17, 714, 14, texture_path, walls_group),
-        Wall(769, 23, 383, 19, texture_path, walls_group),)
+        Wall(961, 762, 398, 17, texture_path, walls_group),
+        Wall(1448, 764, 360, 13, texture_path, walls_group),)
 
     # for wall in walls_data:
     #     x, y, width, height = wall
     #     Wall(x, y, width, height, texture_path, walls_group)
 
-    camera = Camera(1500, 1000)
+    camera = Camera(1200, 630)
 
     def draw():
-        SCREEN.fill((0, 0, 0))
+        SCREEN.blit(map_image, camera.apply_rect(map_image.get_rect()))
         for sprite in walls_group:
             SCREEN.blit(sprite.image, camera.apply(sprite))
         for sprite in main_hero:
@@ -193,7 +167,7 @@ def start():
         else:
             main_hero.update(None, walls_group)
 
-        camera.update(hero)
+        camera.update(hero, 2624, 1554)
         CLOCK.tick(FPS)
         draw()
         pygame.display.flip()
