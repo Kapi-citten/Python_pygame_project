@@ -160,7 +160,7 @@ class MainFight:
 
             if (pygame.time.get_ticks() - self.start_ticks) / 1000 > self.time:
                 if self.draw():
-                    # self.main_music.stop()
+                    self.main_music.stop()
                     return
 
             else:

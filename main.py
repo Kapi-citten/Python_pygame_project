@@ -94,7 +94,7 @@ def start():
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
 
-    Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
+    # Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
 
     main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
     main_music.play(-1)
@@ -107,9 +107,28 @@ def start():
     map_image = load_image('world/map.png')
     map_image = pygame.transform.scale(map_image, (2624, 1554))
     texture_path = "world/wall.png"
-    walls_data = pygame.sprite.Group(
-        Wall(961, 762, 398, 17, texture_path, walls_group),
-        Wall(1448, 764, 360, 13, texture_path, walls_group),)
+    walls_data = pygame.sprite.Group(Wall(962, 763, 367, 16, texture_path, walls_group),
+        Wall(1433, 764, 375, 14, texture_path, walls_group),
+        Wall(1792, 779, 16, 112, texture_path, walls_group),
+        Wall(1793, 892, 318, 15, texture_path, walls_group),
+        Wall(2096, 908, 15, 289, texture_path, walls_group),
+        Wall(551, 1182, 1544, 17, texture_path, walls_group),
+        Wall(390, 1183, 161, 16, texture_path, walls_group),
+        Wall(383, 870, 21, 314, texture_path, walls_group),
+        Wall(404, 870, 561, 12, texture_path, walls_group),
+        Wall(962, 779, 16, 104, texture_path, walls_group),
+        Wall(964, 884, 19, 108, texture_path, walls_group),
+        Wall(963, 1089, 17, 91, texture_path, walls_group),
+        Wall(1792, 907, 13, 96, texture_path, walls_group),
+        Wall(1783, 1074, 21, 108, texture_path, walls_group),
+        Wall(826, 4, 1795, 8, texture_path, walls_group),
+        Wall(15, 5, 811, 8, texture_path, walls_group),
+        Wall(7, 5, 9, 989, texture_path, walls_group),
+        Wall(6, 995, 13, 547, texture_path, walls_group),
+        Wall(20, 1529, 1773, 15, texture_path, walls_group),
+        Wall(1793, 1530, 823, 11, texture_path, walls_group),
+        Wall(2608, 14, 12, 876, texture_path, walls_group),
+        Wall(2609, 890, 7, 640, texture_path, walls_group),)
 
     # for wall in walls_data:
     #     x, y, width, height = wall

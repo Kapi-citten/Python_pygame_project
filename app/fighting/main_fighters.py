@@ -122,9 +122,9 @@ class Golem(MainFight):
 
 class Kasumi(MainFight):
     def __init__(self, npc, hp, damage):
-        # self.main_music = pygame.mixer.Sound('data/music/fight/Dangerous sweetness.mp3')
-        # self.main_music.play(-1)
-        # self.main_music.set_volume(0.5)
+        self.main_music = pygame.mixer.Sound('data/music/fight/Dangerous sweetness.mp3')
+        self.main_music.play(-1)
+        self.main_music.set_volume(0.5)
         super().__init__(npc, hp, damage)
 
     class Knife(pygame.sprite.Sprite):

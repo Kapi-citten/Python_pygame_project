@@ -5,12 +5,10 @@ import numpy as np
 img = cv2.imread("data/image/world/map.png")
 img_h, img_w = img.shape[:2]  # Размеры оригинального изображения
 
-# Размер окна просмотра
 win_h, win_w = 1000, 1800  # Настроить под экран
 scroll_y, scroll_x = 0, 0  # Смещение
 step = 50  # Шаг прокрутки
 
-# Глобальные переменные для рисования
 drawing = False
 start_point = None
 rectangles = []
