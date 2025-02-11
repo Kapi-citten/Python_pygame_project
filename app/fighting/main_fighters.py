@@ -138,17 +138,17 @@ class Kasumi(MainFight):
             self.rect = self.image.get_rect()
 
             if phase == 1:
-                self.rect.x = random.randint(200, 600)
+                self.rect.x = random.randint(100, 1000)
                 self.rect.y = 0
 
             elif phase == 2:
-                self.rect.x = random.randint(200, 600)
-                self.rect.y = 0
+                self.rect.x = 0
+                self.rect.y = random.randint(200, 550)
 
             elif phase == 3:
                 if n:
                     self.rect.x = 0
-                    self.rect.y = random.randint(200, 600)
+                    self.rect.y = random.randint(200, 550)
 
                 else:
                     self.rect.x = random.randint(100, 1000)
@@ -164,7 +164,7 @@ class Kasumi(MainFight):
 
                 else:
                     self.rect.y = random.randint(200, 600)
-                    self.rect.x = 600
+                    self.rect.x = 1100
 
                 self.n = n
             else:
@@ -185,8 +185,16 @@ class Kasumi(MainFight):
 
             elif self.phase == 3:
                 if self.n:
+                    self.image = self.knife_img[self.counter // 4]
+                    self.counter += 1
+                    if self.counter >= 72:
+                        self.counter = 0
                     self.rect.x += 5
                 else:
+                    self.image = self.knife_img[self.counter // 4]
+                    self.counter += 1
+                    if self.counter >= 72:
+                        self.counter = 0
                     self.rect.y += 4
 
             elif self.phase == 5:
@@ -223,7 +231,7 @@ class Kasumi(MainFight):
 
 
         def update(self):
-            if self.phase == 4 or phase == 5:
+            if self.phase == 4 or self.phase == 5:
                 if self.n:
                     self.rect.x += 1
                 else:
@@ -233,24 +241,25 @@ class Kasumi(MainFight):
     def new_logic(self):
         if (pygame.time.get_ticks() - self.start_ticks) / 1000 >= self.timer:
             if self.n == 1:
-                    self.timer += 0.5
+                    self.timer += 0.09
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 2:
-                    self.timer += 0.5
+                    self.timer += 0.7
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 3:
                     self.timer += 0.5
                     self.Knife(self.weapon_in_battle, self.n)
+                    self.Knife(self.weapon_in_battle, self.n, False)
 
             if self.n == 4:
-                    self.timer += 0.5
+                    self.timer += 0.4
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
 
             if self.n == 5:
-                    self.timer += 0.3
+                    self.timer += 0.7
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
                     self.Knife(self.weapon_in_battle, self.n)
@@ -260,16 +269,17 @@ class Kasumi(MainFight):
     def timer_apdate(self):
         if self.n == 2:
             self.timer = 0.2
-            # if self.mercy:
-            #     Dialog(['Ты щадишь меня...? Это шутка? Давай, бей пока я не распластал тебя об камни!',
-            #             'Я...Не шучу...', ],
-            #            ['dialog/Golem/golem.png'],
-            #            ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
-            #
-            # else:
-            #     Dialog(['Готовься к настоящеё атаке!','Пфф.. Ты не сильнее пугала'],
-            #            ['dialog/Golem/golem.png'],
-            #            ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
+            if self.mercy:
+                Dialog(['Пощада... Хорошо, придётся просто бить беспомощного котика...',
+                        'Эй! Я не беспомощный!'],
+                       ['dialog/Kasumi/Kasumi.png'],
+                       ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
+
+            else:
+                Dialog(['Хе-хе... Что ж... Я приподам тебе урок фехтования... Последний в твоей жизни!',
+                        'Ещё посмотрим кто кого!'],
+                       ['dialog/Kasumi/Kasumi.png'],
+                       ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
 
         elif self.n == 3:
             self.timer = 0.2
