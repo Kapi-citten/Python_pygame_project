@@ -8,7 +8,7 @@ from app.fighting.fighting_systems import MainFight
 
 
 class Golem(MainFight):
-    def __init__(self, npc, hp, weapon, damage):
+    def __init__(self, npc, hp, damage):
         self.weapon = [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 4)]
         self.main_music = pygame.mixer.Sound('data/music/beginning/Stone_heart.mp3')
         self.main_music.play(-1)
@@ -245,21 +245,21 @@ class Kasumi(MainFight):
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 2:
-                    self.timer += 0.7
+                    self.timer += 0.4
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 3:
-                    self.timer += 0.5
+                    self.timer += 0.4
                     self.Knife(self.weapon_in_battle, self.n)
                     self.Knife(self.weapon_in_battle, self.n, False)
 
             if self.n == 4:
-                    self.timer += 0.4
+                    self.timer += 0.2
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
 
             if self.n == 5:
-                    self.timer += 0.7
+                    self.timer += 0.75
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
                     self.Knife(self.weapon_in_battle, self.n)
