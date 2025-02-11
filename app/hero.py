@@ -1,6 +1,7 @@
 import pygame
 from main import load_image, SPEED
 
+SPEED_FIGHT = 6
 class Hero(pygame.sprite.Sprite):
     image = load_image("hero/down/move_s_1.png")
 
@@ -22,8 +23,8 @@ class Hero(pygame.sprite.Sprite):
 
         self.image = Hero.image
         self.rect = self.image.get_rect()
-        self.rect.x = 0
-        self.rect.y = 0
+        self.rect.x = 100
+        self.rect.y = 100
         self.mov_index = 0
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -92,28 +93,28 @@ class HeroFight(pygame.sprite.Sprite):
         old_rect = self.rect.copy()
 
         if mov == 'wd':
-            self.rect = self.rect.move(SPEED, -SPEED)
+            self.rect = self.rect.move(SPEED_FIGHT, -SPEED_FIGHT)
 
         elif mov == 'wa':
-            self.rect = self.rect.move(-SPEED, -SPEED)
+            self.rect = self.rect.move(-SPEED_FIGHT, -SPEED_FIGHT)
 
         elif mov == 'sa':
-            self.rect = self.rect.move(-SPEED, SPEED)
+            self.rect = self.rect.move(-SPEED_FIGHT, SPEED_FIGHT)
 
         elif mov == 'sd':
-            self.rect = self.rect.move(SPEED, SPEED)
+            self.rect = self.rect.move(SPEED_FIGHT, SPEED_FIGHT)
 
         elif mov == 'w':
-            self.rect = self.rect.move(0, -SPEED)
+            self.rect = self.rect.move(0, -SPEED_FIGHT)
 
         elif mov == 's':
-            self.rect = self.rect.move(0, SPEED)
+            self.rect = self.rect.move(0, SPEED_FIGHT)
 
         elif mov == 'a':
-            self.rect = self.rect.move(-SPEED, 0)
+            self.rect = self.rect.move(-SPEED_FIGHT, 0)
 
         elif mov == 'd':
-            self.rect = self.rect.move(SPEED, 0)
+            self.rect = self.rect.move(SPEED_FIGHT, 0)
 
         if not walls.contains(self.rect):
             self.rect = old_rect

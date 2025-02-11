@@ -91,8 +91,8 @@ def main_menu():
 
 
 def start():
-    Golem(load_image('fight/golem/golem.png'),
-           10, 0.5)
+    # Golem(load_image('fight/golem/golem.png'),
+    #        10, 0.5)
 
     Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
 

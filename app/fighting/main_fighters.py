@@ -54,22 +54,22 @@ class Golem(MainFight):
 
         def update(self):
             if self.phase == 1:
-                self.rect.y += 4
+                self.rect.y += 8
 
             elif self.phase == 2:
-                self.rect.x += 4
+                self.rect.x += 8
 
             elif self.phase == 3:
-                self.rect.y -= 4
+                self.rect.y -= 8
 
             elif self.phase == 4:
-                self.rect.x -= 4
+                self.rect.x -= 8
 
             elif self.phase == 5:
                 if self.n:
-                    self.rect.x += 5
+                    self.rect.x += 8
                 else:
-                    self.rect.y += 4
+                    self.rect.y += 8
 
 
     def new_logic(self):
@@ -122,9 +122,9 @@ class Golem(MainFight):
 
 class Kasumi(MainFight):
     def __init__(self, npc, hp, damage):
-        # self.main_music = pygame.mixer.Sound('data/music/fight/Dangerous sweetness.mp3')
-        # self.main_music.play(-1)
-        # self.main_music.set_volume(0.5)
+        self.main_music = pygame.mixer.Sound('data/music/fight/Dangerous sweetness.mp3')
+        self.main_music.play(-1)
+        self.main_music.set_volume(0.5)
         super().__init__(npc, hp, damage)
 
     class Knife(pygame.sprite.Sprite):
@@ -174,7 +174,7 @@ class Kasumi(MainFight):
 
         def update(self):
             if self.phase == 1:
-                self.rect.y += 4
+                self.rect.y += 15
 
             elif self.phase == 2:
                 self.rect.x += 1
@@ -254,12 +254,12 @@ class Kasumi(MainFight):
                     self.Knife(self.weapon_in_battle, self.n, False)
 
             if self.n == 4:
-                    self.timer += 0.2
+                    self.timer += 0.18
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
 
             if self.n == 5:
-                    self.timer += 0.75
+                    self.timer += 0.8
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
                     self.Knife(self.weapon_in_battle, self.n)

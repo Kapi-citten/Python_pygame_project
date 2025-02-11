@@ -5,7 +5,7 @@ from app.system import Button
 class MainFight:
     def __init__(self, npc, hp, damage):
         SCREEN.fill((0, 0, 0))
-        self.fps = 170
+        self.fps = 60
 
         self.mercy = True
         self.image_npc = npc
