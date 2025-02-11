@@ -8,7 +8,7 @@ from app.fighting.fighting_systems import MainFight
 
 
 class Golem(MainFight):
-    def __init__(self, npc, hp, weapon, damage):
+    def __init__(self, npc, hp, damage):
         self.weapon = [load_image(f'fight/golem/stone_{i}.png') for i in range(1, 4)]
         self.main_music = pygame.mixer.Sound('data/music/beginning/Stone_heart.mp3')
         self.main_music.play(-1)
@@ -54,22 +54,22 @@ class Golem(MainFight):
 
         def update(self):
             if self.phase == 1:
-                self.rect.y += 4
+                self.rect.y += 8
 
             elif self.phase == 2:
-                self.rect.x += 4
+                self.rect.x += 8
 
             elif self.phase == 3:
-                self.rect.y -= 4
+                self.rect.y -= 8
 
             elif self.phase == 4:
-                self.rect.x -= 4
+                self.rect.x -= 8
 
             elif self.phase == 5:
                 if self.n:
-                    self.rect.x += 5
+                    self.rect.x += 8
                 else:
-                    self.rect.y += 4
+                    self.rect.y += 8
 
 
     def new_logic(self):
@@ -174,7 +174,7 @@ class Kasumi(MainFight):
 
         def update(self):
             if self.phase == 1:
-                self.rect.y += 4
+                self.rect.y += 15
 
             elif self.phase == 2:
                 self.rect.x += 1
@@ -245,21 +245,21 @@ class Kasumi(MainFight):
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 2:
-                    self.timer += 0.7
+                    self.timer += 0.4
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 3:
-                    self.timer += 0.5
+                    self.timer += 0.4
                     self.Knife(self.weapon_in_battle, self.n)
                     self.Knife(self.weapon_in_battle, self.n, False)
 
             if self.n == 4:
-                    self.timer += 0.4
+                    self.timer += 0.18
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
 
             if self.n == 5:
-                    self.timer += 0.7
+                    self.timer += 0.8
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
                     self.Knife(self.weapon_in_battle, self.n)
