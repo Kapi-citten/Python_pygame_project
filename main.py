@@ -91,6 +91,71 @@ def main_menu():
 
 
 def start():
+    class NPC(Wall):
+        def __init__(self, x, y, w, h, image_path, group, fight_class, fight_image, hp, damage, dialog, npc_img, hero_img):
+            super().__init__(x, y, w, h, image_path, group)
+
+            self.fight_class = fight_class
+            self.hp = hp
+            self.damage = damage
+            self.dialog = dialog  # Текст диалога
+            self.fight_image = fight_image  # Изображение для боя
+            self.npc_img = npc_img  # Изображение NPC в диалоге
+            self.hero_img = hero_img  # Изображение героя в диалоге
+            self.fight_done = False  # Проверка, был ли бой
+
+
+            self.button_talk = Button(400, 400, 200, 50, "Говорить", "main_menu/exit_1.png", "main_menu/exit_2.png")
+            self.button_fight = Button(650, 400, 200, 50, "Драться", "fight/attack_1.png", "fight/attack_2.png")
+
+        def start_dialog(self):
+            dialog_box = Dialog(self.dialog, self.npc_img, self.hero_img)
+            dialog_box.dialog(self.draw_npc)
+
+        def start_fight(self):
+            if not self.fight_done:
+                self.fight_class(load_image(self.fight_image), self.hp, self.damage)
+                self.fight_done = True
+
+        def interact(self):
+            running = True
+            menu_background = pygame.Surface((400, 200))
+            menu_background.set_alpha(180)
+            menu_background.fill((0, 0, 0))
+
+            while running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
+                        CURSOR.update(event)
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if self.button_talk.rect.collidepoint(event.pos):
+                            self.start_dialog()
+                            running = False
+                        elif self.button_fight.rect.collidepoint(event.pos):
+                            self.start_fight()
+                            running = False
+
+                SCREEN.blit(map_image, camera.apply_rect(map_image.get_rect()))
+                for sprite in walls_group:
+                    SCREEN.blit(sprite.image, camera.apply(sprite))
+                for sprite in main_hero:
+                    SCREEN.blit(sprite.image, camera.apply(sprite))
+                SCREEN.blit(self.image, camera.apply(self))
+
+                SCREEN.blit(menu_background, (400, 350))
+
+                self.button_talk.draw(pygame.mouse.get_pos())
+                self.button_fight.draw(pygame.mouse.get_pos())
+
+                CURSOR.draw(SCREEN)
+
+                pygame.display.flip()
+
+        def draw_npc(self):
+            SCREEN.blit(self.image, self.rect)
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
 
@@ -100,12 +165,15 @@ def start():
     main_music.play(-1)
     main_music.set_volume(0.8)
 
+    camera = Camera(1200, 630)
+    map_image = load_image('world/map.png')
+    map_image = pygame.transform.scale(map_image, (2624, 1554))
+
+
     main_hero = pygame.sprite.Group()
     hero = Hero(main_hero)
     running = True
     walls_group = pygame.sprite.Group()
-    map_image = load_image('world/map.png')
-    map_image = pygame.transform.scale(map_image, (2624, 1554))
     texture_path = "world/wall.png"
     walls_data = pygame.sprite.Group(
         Wall(962, 763, 367, 16, texture_path, walls_group),
@@ -137,7 +205,7 @@ def start():
     kasumi = NPC(
         x=1100, y=900, w=50, h=100,
         image_path="fight/Kasumi/Kasumi.png",
-        group=npc_group, fight_class=Kasumi, fight_image="fight/Kasumi/knife_2.png",
+        group=npc_group, fight_class=Kasumi, fight_image="fight/Kasumi/Kasumi.png",
         hp=10, damage=0.5,
         dialog=["Салам алейкум!", "Ты хочешь сразиться со мной?"],
         npc_img=["dialog/Kasumi/Kasumi.png"],
@@ -146,7 +214,6 @@ def start():
 
     npc_group.add(kasumi)
 
-    camera = Camera(1200, 630)
 
     def draw():
         SCREEN.blit(map_image, camera.apply_rect(map_image.get_rect()))
@@ -212,7 +279,7 @@ if __name__ == "__main__":
     from app.hero import Hero, HeroFight
     from app.fighting.fighting_system import MainFight
     from app.fighting.main_fighters import Golem, Kasumi
+    from app.world import Wall, Door, Dialog
     from app.system import Button, Camera
-    from app.world import Wall, Door, Dialog, NPC
 
     main_menu()
