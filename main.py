@@ -94,7 +94,7 @@ def start():
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
 
-    # Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
+    Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
 
     main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
     main_music.play(-1)

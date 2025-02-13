@@ -7,6 +7,7 @@ class MainFight:
         SCREEN.fill((0, 0, 0))
         self.fps = 60
 
+        self.damage_music = pygame.mixer.Sound('data/music/fight/damage.mp3')
         self.mercy = True
         self.image_npc = npc
         self.rect_npc = self.image_npc.get_rect()
@@ -113,6 +114,7 @@ class MainFight:
     def battle_analysis(self):
         self.start_ticks = pygame.time.get_ticks()
         run = True
+        music = False
         while run:
 
             for event in pygame.event.get():
@@ -157,6 +159,11 @@ class MainFight:
             for weapon in self.weapon_in_battle.sprites():
                 if pygame.sprite.collide_mask(weapon, self.hero):
                     self.hero_hp -= self.damage
+                    if not music:
+                        self.damage_music.play()
+                        music = True
+                    else:
+                        music = False
 
             if (pygame.time.get_ticks() - self.start_ticks) / 1000 > self.time:
                 if self.draw():
