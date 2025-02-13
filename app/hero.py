@@ -28,7 +28,7 @@ class Hero(pygame.sprite.Sprite):
         self.mov_index = 0
         self.mask = pygame.mask.from_surface(self.image)
 
-    def update(self, mov, walls_group):
+    def update(self, mov, walls_group, npc_group):
         # mov = args[0].key
         old_rect = self.rect.copy()
 
@@ -74,6 +74,10 @@ class Hero(pygame.sprite.Sprite):
         # self.mask = pygame.mask.from_surface(self.image)
         for wall in walls_group:
             if pygame.sprite.collide_mask(self, wall):
+                self.rect = old_rect
+        
+        for npc in npc_group:
+            if pygame.sprite.collide_mask(self, npc):
                 self.rect = old_rect
 
     def get(self):

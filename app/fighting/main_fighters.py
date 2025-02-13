@@ -4,7 +4,7 @@ import pygame
 import random
 from app.world import Dialog
 from main import load_image
-from app.fighting.fighting_systems import MainFight
+from app.fighting.fighting_system import MainFight
 
 
 class Golem(MainFight):
