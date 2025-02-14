@@ -91,10 +91,11 @@ def main_menu():
 
 
 def start():
+
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
 
-    Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
+    # Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
 
     main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
     main_music.play(-1)
@@ -134,20 +135,6 @@ def start():
 
     npc_group = pygame.sprite.Group()
 
-    kasumi = NPC(
-        x=1100, y=900, w=50, h=100,
-        image_path="fight/Kasumi/Kasumi.png",
-        group=npc_group, fight_class=Kasumi, fight_image="fight/Kasumi/knife_2.png",
-        hp=10, damage=0.5,
-        dialog=["Салам алейкум!", "Ты хочешь сразиться со мной?"],
-        npc_img=["dialog/Kasumi/Kasumi.png"],
-        hero_img=["dialog/main_hero/cute_1.png"]
-    )
-
-    npc_group.add(kasumi)
-
-    camera = Camera(1200, 630)
-
     def draw():
         SCREEN.blit(map_image, camera.apply_rect(map_image.get_rect()))
         for sprite in walls_group:
@@ -158,8 +145,38 @@ def start():
             SCREEN.blit(sprite.image, camera.apply(sprite))
         CURSOR.draw(SCREEN)
 
-    while running:
 
+
+    kasumi = NPC(
+        x=1100, y=900, w=50, h=100,
+        image_path="world/NPC/Kasumi.png",
+        group=npc_group,
+        dialog=[
+            "Хмм... *Подняла на тебя недобродушный взгляд* |Можешь не говорить кто ты, я и так знаю... Я Касуми. Ты наверное по поводу преступления?",
+            "Ну...."],
+        npc_img=["dialog/Kasumi/Kasumi.png"],
+        hero_img=["dialog/main_hero/cute_1.png"], draw=draw,
+        fight_info=[Kasumi, load_image('fight/Kasumi/Kasumi.png'), 10, 0.5],
+        dialog_yes=Dialog(['Эх... Глупыш... Мне жаль.. но..', 'Я расследую это дело! Никаких "НО".',
+                           '*Суёт руку в карман и что-то там нащупывает* |Ты думал я так просто скажу...? Ты ошибся...',
+                           'Касуми... Постой, если ты не хочешь... |*Касуми нападает на вас*'],
+                          ['dialog/Kasumi/Kasumi.png', 'dialog/Kasumi/Kasumi.png'],
+                          ['dialog/main_hero/perplexed.png', 'dialog/main_hero/omg.png']),
+        dialog_no=Dialog(
+            ['Окей... *лицо приняло более миловидный вид* |Если что нужно обращайся ^^', 'Хорошо, увидимся!'],
+            ['dialog/Kasumi/Kasumi_meow.png'], ['dialog/main_hero/cute_1.png']),
+        other_music=main_music)
+
+    npc_group.add(kasumi)
+
+    camera = Camera(1200, 630)
+
+    while running:
+        # Dialog(['Эх... Глупыш... Мне жаль.. но..', 'Я расследую это дело! Никаких "НО".',
+        #         '*Суёт руку в карман и что-то там нащупывает* |Ты думал я так просто скажу...? Ты ошибся...',
+        #         'Касуми... Постой, если ты не хочешь... |*Касуми нападает на вас*'],
+        #        ['dialog/Kasumi/Kasumi.png', 'dialog/Kasumi/Kasumi.png'],
+        #        ['dialog/main_hero/perplexed.png', 'dialog/main_hero/omg.png']).dialog(draw)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -170,7 +187,7 @@ def start():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
                 for npc in npc_group:
                     if hero.rect.colliderect(npc.rect):
-                        npc.interact()
+                        npc.start_dialog()
 
         pressed = pygame.key.get_pressed()
 

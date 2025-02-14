@@ -43,12 +43,16 @@ class Dialog:
     def dialog(self, draw_method):
         font = pygame.font.Font(None, 36)
         for i in range(len(self.text)):
-            s = ''
-
+            all_text = ['']
             for j in self.text[i]:
                 for txt in j:
-                    s += txt
-                    text = font.render(s, True, (255, 255, 255))
+                    all_text_draw = []
+                    if txt != '|':
+                        all_text[-1] += txt
+                    else:
+                        all_text.append('')
+                    for one_text in all_text:
+                        all_text_draw.append(font.render(one_text, True, (255, 255, 255)))
                     draw_method()
                     if self.main_hero:
                         SCREEN.blit(self.image_hero[self.n], (860, 170))
@@ -57,8 +61,9 @@ class Dialog:
                     SCREEN.fill(pygame.Color(self.color), self.rect)
                     [CURSOR.update(event) for event in pygame.event.get() if
                      event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused()]
-                    CURSOR.draw(SCREEN)
-                    SCREEN.blit(text, (self.x, self.y))
+                    for index in range(len(all_text_draw)):
+                        SCREEN.blit(all_text_draw[index], (self.x, self.y + index * 40))
+                        CURSOR.draw(SCREEN)
                     CLOCK.tick(self.fps)
                     pygame.display.flip()
             t = True
@@ -73,7 +78,6 @@ class Dialog:
                             pygame.mouse.get_pos()):
                         t = False
 
-                text = font.render(s, True, (255, 255, 255))
                 draw_method()
                 if self.main_hero:
                     SCREEN.blit(self.image_hero[self.n], (860, 170))
@@ -81,8 +85,10 @@ class Dialog:
                     SCREEN.blit(self.image_npc[self.n], (0, 200))
 
                 SCREEN.fill(pygame.Color(self.color), self.rect)
+                for index in range(len(all_text_draw)):
+                    SCREEN.blit(all_text_draw[index], (self.x, self.y + index * 40))
                 CURSOR.draw(SCREEN)
-                SCREEN.blit(text, (self.x, self.y))
+
                 CLOCK.tick(self.fps)
                 pygame.display.flip()
 
@@ -93,58 +99,66 @@ class Dialog:
                 self.main_hero = True
 
 
+def сhoice(draw_method):
+    button_no = Button(400, 400, 200, 50, "Говорить", "main_menu/exit_1.png", "main_menu/exit_2.png")
+    button_yes = Button(650, 400, 200, 50, "Драться", "fight/attack_1.png", "fight/attack_2.png")
+
+    def draw():
+        draw_method()
+        button_yes.draw(pygame.mouse.get_pos())
+        button_no.draw(pygame.mouse.get_pos())
+        CURSOR.draw(SCREEN)
+
+    t = True
+    agree = False
+    while t:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                t = False
+            if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
+                CURSOR.update(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_focused():
+                button_no.event(pygame.mouse.get_pos(), event)
+                button_yes.event(pygame.mouse.get_pos(), event)
+
+            if event.type == pygame.USEREVENT and event.button == button_no:
+                t = False
+            if event.type == pygame.USEREVENT and event.button == button_yes:
+                t = False
+                agree = True
+        draw()
+        pygame.display.flip()
+
+    if agree:
+        return True
+    return False
+
+
 class NPC(Wall):
-    def __init__(self, x, y, w, h, image_path, group, fight_class, fight_image, hp, damage, dialog, npc_img, hero_img):
+    def __init__(self, x, y, w, h, image_path, group, fight_info, dialog, npc_img, hero_img, draw, dialog_yes, dialog_no, other_music):
         super().__init__(x, y, w, h, image_path, group)
 
-        self.fight_class = fight_class
-        self.hp = hp
-        self.damage = damage
+        self.dialog_yes = dialog_yes
+        self.dialog_no = dialog_no
+        self.draw = draw
+        self.other_music = other_music
         self.dialog = dialog  # Текст диалога
-        self.fight_image = fight_image  # Изображение для боя
+        self.fight_info = fight_info
         self.npc_img = npc_img  # Изображение NPC в диалоге
         self.hero_img = hero_img  # Изображение героя в диалоге
         self.fight_done = False  # Проверка, был ли бой
 
-
-        self.button_talk = Button(400, 400, 200, 50, "Говорить", "main_menu/exit_1.png", "main_menu/exit_2.png")
-        self.button_fight = Button(650, 400, 200, 50, "Драться", "fight/attack_1.png", "fight/attack_2.png")
-
     def start_dialog(self):
-        dialog_box = Dialog(self.dialog, self.npc_img, self.hero_img)
-        dialog_box.dialog(self.draw_npc)
-
-    def start_fight(self):
         if not self.fight_done:
-            self.fight_class(load_image(self.fight_image), self.hp, self.damage)
-            self.fight_done = True
+            dialog_box = Dialog(self.dialog, self.npc_img, self.hero_img)
+            dialog_box.dialog(self.draw)
+            if сhoice(self.draw):
+                self.dialog_yes.dialog(self.draw)
+                self.other_music.stop()
+                self.fight_info[0](self.fight_info[1],self.fight_info[2],self.fight_info[3])
+                self.other_music.play()
+                self.fight_done = True
+            else:
+                self.dialog_no.dialog(self.draw)
 
-    def interact(self):
-        running = True
-        while running:
-            SCREEN.fill((0, 0, 0))
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
-                    CURSOR.update(event)
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.button_talk.rect.collidepoint(event.pos):
-                        self.start_dialog()
-                        running = False
-                    elif self.button_fight.rect.collidepoint(event.pos):
-                        self.start_fight()
-                        running = False
-
-            SCREEN.fill((0, 0, 0))
-            SCREEN.blit(self.image, self.rect)
-            self.button_talk.draw(pygame.mouse.get_pos())
-            self.button_fight.draw(pygame.mouse.get_pos())
-
-            pygame.display.flip()
-
-    def draw_npc(self):
-        SCREEN.blit(self.image, self.rect)
