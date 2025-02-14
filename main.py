@@ -119,7 +119,7 @@ def start():
 
         def interact(self):
             running = True
-            menu_background = pygame.Surface((400, 200))
+            menu_background = pygame.Surface((450, 200))
             menu_background.set_alpha(180)
             menu_background.fill((0, 0, 0))
 
@@ -156,6 +156,8 @@ def start():
 
         def draw_npc(self):
             SCREEN.blit(self.image, self.rect)
+
+
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
 
@@ -176,8 +178,8 @@ def start():
     walls_group = pygame.sprite.Group()
     texture_path = "world/wall.png"
     walls_data = pygame.sprite.Group(
-        Wall(962, 763, 367, 16, texture_path, walls_group),
-        Wall(1433, 764, 375, 14, texture_path, walls_group),
+        Wall(962, 763, 367, 40, texture_path, walls_group),
+        Wall(1433, 763, 375, 40, texture_path, walls_group),
         Wall(1792, 779, 16, 112, texture_path, walls_group),
         Wall(1793, 892, 318, 15, texture_path, walls_group),
         Wall(2096, 908, 15, 289, texture_path, walls_group),
@@ -201,6 +203,9 @@ def start():
     )
 
     npc_group = pygame.sprite.Group()
+    doors_group = pygame.sprite.Group(
+        Door(1329, 763, 104, 40, "world/door.jpg", "world/map.png", walls_group),
+    )
 
     kasumi = NPC(
         x=1100, y=900, w=50, h=100,
@@ -238,6 +243,8 @@ def start():
                 for npc in npc_group:
                     if hero.rect.colliderect(npc.rect):
                         npc.interact()
+                for door in doors_group:
+                    door.interact(hero.rect)
 
         pressed = pygame.key.get_pressed()
 

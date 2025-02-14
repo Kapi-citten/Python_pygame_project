@@ -1,6 +1,4 @@
 import pygame
-import main
-print(dir(main))
 
 from main import load_image, SCREEN
 from main import FPS, CLOCK, terminate, CURSOR
@@ -18,7 +16,27 @@ class Wall(pygame.sprite.Sprite):
 
 
 class Door(Wall):
-    pass
+    def __init__(self, x, y, w, h, closed_image, open_image, group):
+        super().__init__(x, y, w, h, closed_image, group)
+
+        self.closed_image = pygame.transform.scale(load_image(closed_image), (w, h))
+        self.open_image = pygame.transform.scale(load_image(open_image), (w, h))
+        self.is_open = False
+
+    def open(self):
+        if self.is_open:
+            self.image = self.closed_image
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            self.image = self.open_image
+            self.mask = pygame.mask.Mask((0, 0))
+
+        self.is_open = not self.is_open
+
+    def interact(self, hero_rect):
+        if self.rect.colliderect(hero_rect.inflate(10, 10)):
+            self.open()
+
 
 
 class Dialog:
