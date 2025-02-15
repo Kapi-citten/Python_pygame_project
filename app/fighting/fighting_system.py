@@ -1,6 +1,7 @@
 from app.hero import HeroFight
-from main import SCREEN, CURSOR, CLOCK, pygame, terminate
+from main import SCREEN, CURSOR, CLOCK, pygame, terminate, load_image
 from app.system import Button
+
 
 class MainFight:
     def __init__(self, npc, hp, damage):
@@ -25,9 +26,9 @@ class MainFight:
         self.rect = pygame.Rect(100, 250, 1000, 370)
         self.time = 4
         self.button_attack = Button(50, 20, 305, 150, '', 'fight/attack_1.png', 'fight/attack_2.png',
-                                   'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
-        self.button_mercy = Button(850, 20, 305, 150, '', 'fight/mercy_1.png', 'fight/mercy_2.png',
                                     'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
+        self.button_mercy = Button(850, 20, 305, 150, '', 'fight/mercy_1.png', 'fight/mercy_2.png',
+                                   'data/music/main_menu/button/aim.mp3', 'data/music/main_menu/button/clik.mp3')
 
         # self.mask = pygame.mask.Mask((self.rect.width, self.rect.height))
         # self.mask.fill()
@@ -37,21 +38,20 @@ class MainFight:
         self.start_ticks = pygame.time.get_ticks()
 
         self.timer = 0.5
-        self.battle_analysis()
+        # self.battle_analysis()
 
     def draw_health_bar(self):
         hero_bar_width = 300
         hero_bar_height = 20
         hero_bar_x = 50
-        hero_bar_y = 50  
+        hero_bar_y = 50
         max_hp = 200
         hero_health_ratio = self.hero_hp / max_hp
 
         pygame.draw.rect(SCREEN, (255, 0, 0), (hero_bar_x, hero_bar_y, hero_bar_width, hero_bar_height))
-        pygame.draw.rect(SCREEN, (0, 255, 0), (hero_bar_x, hero_bar_y, hero_bar_width * hero_health_ratio, hero_bar_height))
+        pygame.draw.rect(SCREEN, (0, 255, 0),
+                         (hero_bar_x, hero_bar_y, hero_bar_width * hero_health_ratio, hero_bar_height))
         pygame.draw.rect(SCREEN, (255, 255, 255), (hero_bar_x, hero_bar_y, hero_bar_width, hero_bar_height), 2)
-
-
 
     def draw_fight(self):
         SCREEN.fill((0, 0, 0))
@@ -87,7 +87,6 @@ class MainFight:
                         return True
                     t = False
 
-
                 if event.type == pygame.USEREVENT and event.button == self.button_attack:
                     self.hp -= 3
                     self.n += 1
@@ -106,11 +105,13 @@ class MainFight:
             pygame.display.flip()
         self.timer_apdate()
         self.start_ticks = pygame.time.get_ticks()
+
     def new_logic(self):
         pass
 
     def timer_apdate(self):
         pass
+
     def battle_analysis(self):
         self.start_ticks = pygame.time.get_ticks()
         run = True
@@ -176,16 +177,38 @@ class MainFight:
             CLOCK.tick(self.fps)
 
             if self.hero_hp <= 0:
-                run = True
-                while run:
+                self.main_music.stop()
+                self.game_over()
+                return None
 
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            terminate()
+    def game_over(self):
+        music_over = pygame.mixer.Sound('data/music/fight/over.mp3')
+        music_over.play(-1)
+        music_over.set_volume(0.5)
+        run = True
+        start_timer = pygame.time.get_ticks()
+        index = 0
+        over_image = [load_image(f'fight/game_over_{i}.jpg') for i in range(1, 5)]
+        def draw(i):
+            SCREEN.blit(over_image[i // 20], (0, 0))
+            CURSOR.draw(SCREEN)
+            CLOCK.tick(80)
+            pygame.display.flip()
+        while run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                if event.type == pygame.MOUSEBUTTONDOWN and (pygame.time.get_ticks() - start_timer) / 1000 >= 5:
+                    run = False
+                if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
+                    CURSOR.update(event)
+            index += 1
+            if index == 80:
+                index = 0
+            draw(index)
+        music_over.stop()
     def mercy_end(self):
         pass
 
     def killer_end(self):
         pass
-        # if not pygame.sprite.collide_mask(self.rect_mask, self.hero):
-        #     self.rect = self.rect.move(0, 1)

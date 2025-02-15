@@ -16,7 +16,26 @@ class Wall(pygame.sprite.Sprite):
 
 
 class Door(Wall):
-    pass
+    def __init__(self, x, y, w, h, closed_image, open_image, group):
+        super().__init__(x, y, w, h, closed_image, group)
+
+        self.closed_image = pygame.transform.scale(load_image(closed_image), (w, h))
+        self.open_image = pygame.transform.scale(load_image(open_image), (w, h))
+        self.is_open = False
+
+    def open(self, hero_rect):
+        if self.is_open and not self.rect.colliderect(hero_rect):
+            self.image = self.closed_image
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            self.image = self.open_image
+            self.mask = pygame.mask.Mask((0, 0))
+
+        self.is_open = not self.is_open
+
+    def interact(self, hero_rect):
+        if self.rect.colliderect(hero_rect.inflate(15, 15)):
+            self.open(hero_rect)
 
 
 class Dialog:
@@ -133,10 +152,25 @@ def сhoice(draw_method):
         return True
     return False
 
+class Kapi(pygame.sprite.Sprite):
+    def __init__(self, x, y, w, image_path, group):
+        super().__init__(group)
+        self.image = load_image(image_path)
+        orig_width, orig_height = self.image.get_size()
+        h = int(w * orig_height / orig_width)
+        self.image = pygame.transform.scale(self.image, (w, h))
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.mask = pygame.mask.from_surface(self.image)
 
-class NPC(Wall):
-    def __init__(self, x, y, w, h, image_path, group, fight_info, dialog, npc_img, hero_img, draw, dialog_yes, dialog_no, other_music):
-        super().__init__(x, y, w, h, image_path, group)
+class NPC(pygame.sprite.Sprite):
+    def __init__(self, x, y, w, image_path, group, fight_info, dialog, npc_img, hero_img, draw, dialog_yes, dialog_no, other_music):
+        super().__init__(group)
+        self.image = load_image(image_path)
+        orig_width, orig_height = self.image.get_size()
+        h = int(w * orig_height / orig_width)
+        self.image = pygame.transform.scale(self.image, (w, h))
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.mask = pygame.mask.from_surface(self.image)
 
         self.dialog_yes = dialog_yes
         self.dialog_no = dialog_no

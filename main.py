@@ -94,8 +94,8 @@ def start():
 
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
-
-    # Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5)
+    # if Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5).battle_analysis() is None:
+    #     main_menu()
 
     main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
     main_music.play(-1)
@@ -109,8 +109,8 @@ def start():
     map_image = pygame.transform.scale(map_image, (2624, 1554))
     texture_path = "world/wall.png"
     walls_data = pygame.sprite.Group(
-        Wall(962, 763, 367, 16, texture_path, walls_group),
-        Wall(1433, 764, 375, 14, texture_path, walls_group),
+        Wall(962, 763, 367, 40, texture_path, walls_group),
+        Wall(1433, 763, 375, 40, texture_path, walls_group),
         Wall(1792, 779, 16, 112, texture_path, walls_group),
         Wall(1793, 892, 318, 15, texture_path, walls_group),
         Wall(2096, 908, 15, 289, texture_path, walls_group),
@@ -134,6 +134,9 @@ def start():
     )
 
     npc_group = pygame.sprite.Group()
+    doors_group = pygame.sprite.Group(
+        Door(1329, 763, 104, 40, "world/door.jpg", "world/door_open.png", walls_group),
+    )
 
     def draw():
         SCREEN.blit(map_image, camera.apply_rect(map_image.get_rect()))
@@ -146,9 +149,12 @@ def start():
         CURSOR.draw(SCREEN)
 
 
+    kapi = Kapi(x=1000, y=600, w=45,
+        image_path="world/NPC/Kapi.png",
+        group=npc_group)
 
     kasumi = NPC(
-        x=1100, y=900, w=50, h=100,
+        x=1100, y=900, w=46,
         image_path="world/NPC/Kasumi.png",
         group=npc_group,
         dialog=[
@@ -167,7 +173,8 @@ def start():
             ['dialog/Kasumi/Kasumi_meow.png'], ['dialog/main_hero/cute_1.png']),
         other_music=main_music)
 
-    npc_group.add(kasumi)
+    # npc_group.add(kasumi)
+    # npc_group.add(kapi)
 
     camera = Camera(1200, 630)
 
@@ -188,6 +195,8 @@ def start():
                 for npc in npc_group:
                     if hero.rect.colliderect(npc.rect):
                         npc.start_dialog()
+                    for door in doors_group:
+                        door.interact(hero.rect)
 
         pressed = pygame.key.get_pressed()
 
@@ -230,6 +239,6 @@ if __name__ == "__main__":
     from app.fighting.fighting_system import MainFight
     from app.fighting.main_fighters import Golem, Kasumi
     from app.system import Button, Camera
-    from app.world import Wall, Door, Dialog, NPC
+    from app.world import Wall, Door, Dialog, NPC, Kapi
 
     main_menu()

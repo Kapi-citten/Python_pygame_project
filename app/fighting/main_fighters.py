@@ -125,6 +125,7 @@ class Kasumi(MainFight):
         self.main_music = pygame.mixer.Sound('data/music/fight/Dangerous sweetness.mp3')
         self.main_music.play(-1)
         self.main_music.set_volume(0.5)
+        self.time = 10
         super().__init__(npc, hp, damage)
 
     class Knife(pygame.sprite.Sprite):
@@ -177,7 +178,7 @@ class Kasumi(MainFight):
                 self.rect.y += 15
 
             elif self.phase == 2:
-                self.rect.x += 1
+                self.rect.x += 4
                 self.image = self.knife_img[self.counter//4]
                 self.counter += 1
                 if self.counter >= 72:
@@ -222,9 +223,13 @@ class Kasumi(MainFight):
             if phase == 4 or phase == 5:
                 if n:
                     self.rect.x = random.randint(100, 800)
+                    self.rect.y = 0
+                elif n is None:
+                    self.rect.x = 0
+                    self.rect.y = random.randint(200, 600)
                 else:
                     self.rect.x = random.randint(300, 1000)
-                self.rect.y = 0
+                    self.rect.y = 0
                 self.n = n
 
             self.phase = phase
@@ -234,9 +239,12 @@ class Kasumi(MainFight):
             if self.phase == 4 or self.phase == 5:
                 if self.n:
                     self.rect.x += 1
+                    self.rect.y += 3
+                elif self.n is None:
+                    self.rect.x += 3
                 else:
                     self.rect.x -= 1
-                self.rect.y += 3
+                    self.rect.y += 3
 
     def new_logic(self):
         if (pygame.time.get_ticks() - self.start_ticks) / 1000 >= self.timer:
@@ -245,7 +253,7 @@ class Kasumi(MainFight):
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 2:
-                    self.timer += 0.4
+                    self.timer += 0.25
                     self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 3:
@@ -255,6 +263,7 @@ class Kasumi(MainFight):
 
             if self.n == 4:
                     self.timer += 0.18
+                    self.Knife(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n)
                     self.Fireball(self.weapon_in_battle, self.n, False)
 
@@ -268,6 +277,7 @@ class Kasumi(MainFight):
 
     def timer_apdate(self):
         if self.n == 2:
+            self.time = 10
             self.timer = 0.2
             if self.mercy:
                 Dialog(['Пощада... Хорошо, придётся просто бить беспомощного котика...',
