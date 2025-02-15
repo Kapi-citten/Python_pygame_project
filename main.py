@@ -91,7 +91,6 @@ def main_menu():
 
 
 def start():
-
     # Golem(load_image('fight/golem/golem.png'),
     #        10, 0.5)
     # if Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5).battle_analysis() is None:
@@ -101,12 +100,15 @@ def start():
     main_music.play(-1)
     main_music.set_volume(0.8)
 
+    camera = Camera(1200, 630)
+    map_image = load_image('world/map.png')
+    map_image = pygame.transform.scale(map_image, (2624, 1554))
+
+
     main_hero = pygame.sprite.Group()
     hero = Hero(main_hero)
     running = True
     walls_group = pygame.sprite.Group()
-    map_image = load_image('world/map.png')
-    map_image = pygame.transform.scale(map_image, (2624, 1554))
     texture_path = "world/wall.png"
     walls_data = pygame.sprite.Group(
         Wall(962, 763, 367, 40, texture_path, walls_group),

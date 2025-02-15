@@ -38,8 +38,7 @@ def draw_rectangle(event, x, y, flags, param):
 
         rectangles.append((x1, y1, width, height))
 
-        # Вывод корректного кода для Pygame
-        print(f"Wall({x1}, {y1}, {width}, {height}, texture_path, walls_group),")
+        print(f"Plant({x1}, {y1}, {width}, {height}, texture_path, walls_group),")
 
         cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
         show_image(img)
@@ -54,7 +53,6 @@ def scroll(event, x, y, flags, param):
         show_image(img)
 
 def show_image(image):
-    """ Отображение части изображения с учетом прокрутки """
     cropped = image[scroll_y:scroll_y + win_h, scroll_x:scroll_x + win_w]
     cv2.imshow("Scrollable Image", cropped)
 
@@ -68,13 +66,13 @@ while True:
     key = cv2.waitKey(1) & 0xFF
     if key == ord("q"):
         break
-    elif key == ord("w"):  # Прокрутка вверх
+    elif key == ord("w"):
         scroll_y = max(0, scroll_y - step)
-    elif key == ord("s"):  # Прокрутка вниз
+    elif key == ord("s"):
         scroll_y = min(img_h - win_h, scroll_y + step)
-    elif key == ord("a"):  # Прокрутка влево
+    elif key == ord("a"):
         scroll_x = max(0, scroll_x - step)
-    elif key == ord("d"):  # Прокрутка вправо
+    elif key == ord("d"):
         scroll_x = min(img_w - win_w, scroll_x + step)
 
     show_image(img)
