@@ -195,8 +195,8 @@ def start():
                 for npc in npc_group:
                     if hero.rect.colliderect(npc.rect):
                         npc.start_dialog()
-                    for door in doors_group:
-                        door.interact(hero.rect)
+                for door in doors_group:
+                    door.interact(hero.rect) #почему ружьё и почкмц читаешь с листа
 
         pressed = pygame.key.get_pressed()
 
