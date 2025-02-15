@@ -177,8 +177,9 @@ def start():
     running = True
     walls_group = pygame.sprite.Group()
     texture_path = "world/wall.png"
+    # tree
     walls_data = pygame.sprite.Group(
-        Wall(962, 763, 367, 40, texture_path, walls_group),
+        Wall(962, 763, 400, 40, texture_path, walls_group),
         Wall(1433, 763, 375, 40, texture_path, walls_group),
         Wall(1792, 779, 16, 112, texture_path, walls_group),
         Wall(1793, 892, 318, 15, texture_path, walls_group),
@@ -204,8 +205,9 @@ def start():
 
     npc_group = pygame.sprite.Group()
     doors_group = pygame.sprite.Group(
-        Door(1329, 763, 104, 40, "world/door.jpg", "world/map.png", walls_group),
+        Door(1362, 763, 71, 40, "world/door.jpg", "world/opened_wall.png", walls_group),
     )
+    plants_group = pygame.sprite.Group()
 
     kasumi = NPC(
         x=1100, y=900, w=50, h=100,
