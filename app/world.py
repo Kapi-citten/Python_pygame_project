@@ -1,9 +1,8 @@
 import pygame
 
-from main import load_image, SCREEN
+from main import load_image, SCREEN, main_menu
 from main import FPS, CLOCK, terminate, CURSOR
 from app.system import Button
-from app.fighting.fighting_system import MainFight
 
 
 class Wall(pygame.sprite.Sprite):
@@ -119,8 +118,8 @@ class Dialog:
 
 
 def сhoice(draw_method):
-    button_no = Button(400, 400, 200, 50, "Говорить", "main_menu/exit_1.png", "main_menu/exit_2.png")
-    button_yes = Button(650, 400, 200, 50, "Драться", "fight/attack_1.png", "fight/attack_2.png")
+    button_no = Button(400, 400, 200, 50, "Говорить", "dialog/no.png", "main_menu/exit_2.png")
+    button_yes = Button(650, 400, 200, 50, "Драться", "dialog/yes.png", "fight/attack_2.png")
 
     def draw():
         draw_method()
@@ -153,7 +152,7 @@ def сhoice(draw_method):
     return False
 
 class Kapi(pygame.sprite.Sprite):
-    def __init__(self, x, y, w, image_path, group):
+    def __init__(self, x, y, w, image_path, group, dialog):
         super().__init__(group)
         self.image = load_image(image_path)
         orig_width, orig_height = self.image.get_size()
@@ -161,6 +160,10 @@ class Kapi(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (w, h))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.mask = pygame.mask.from_surface(self.image)
+        self.dialog = dialog
+
+    def start_dialog(self):
+        self.dialog.dialog()
 
 class NPC(pygame.sprite.Sprite):
     def __init__(self, x, y, w, image_path, group, fight_info, dialog, npc_img, hero_img, draw, dialog_yes, dialog_no, other_music):
@@ -189,7 +192,10 @@ class NPC(pygame.sprite.Sprite):
             if сhoice(self.draw):
                 self.dialog_yes.dialog(self.draw)
                 self.other_music.stop()
-                self.fight_info[0](self.fight_info[1],self.fight_info[2],self.fight_info[3])
+
+                if self.fight_info[0](self.fight_info[1],self.fight_info[2],self.fight_info[3]) .battle_analysis() is None:
+                    return True
+
                 self.other_music.play()
                 self.fight_done = True
             else:
