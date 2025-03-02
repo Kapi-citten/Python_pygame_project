@@ -93,9 +93,8 @@ def main_menu():
 def start():
 
     # Golem(load_image('fight/golem/golem.png'),
-    #        10, 0.5)
-    # if Kasumi(load_image('fight/Kasumi/Kasumi.png'), 10, 0.5).battle_analysis() is None:
-    #     main_menu()
+    #        10, 0.5).battle_analysis()
+
 
     main_music = pygame.mixer.Sound('data/music/beginning/Make yourself at home.mp3')
     main_music.play(-1)
@@ -151,7 +150,9 @@ def start():
 
     kapi = Kapi(x=1000, y=600, w=45,
         image_path="world/NPC/Kapi.png",
-        group=npc_group)
+        group=npc_group, dialog=Dialog(
+            ['Я рад тебя видеть :3... |И в следующей версии я буду предлагать тебе обучение', 'Хорошо, увидимся!| Пока можешь, поговорить с Касуми'],
+                                       ['dialog/Kapi^3/kapicute.png'], ['dialog/main_hero/cute_1.png']))
 
     kasumi = NPC(
         x=1100, y=900, w=46,
@@ -194,9 +195,10 @@ def start():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
                 for npc in npc_group:
                     if hero.rect.colliderect(npc.rect):
-                        npc.start_dialog()
+                        if npc.start_dialog():
+                            main_menu()
                 for door in doors_group:
-                    door.interact(hero.rect) #почему ружьё и почкмц читаешь с листа
+                    door.interact(hero.rect)
 
         pressed = pygame.key.get_pressed()
 
@@ -236,7 +238,6 @@ def start():
 
 if __name__ == "__main__":
     from app.hero import Hero, HeroFight
-    from app.fighting.fighting_system import MainFight
     from app.fighting.main_fighters import Golem, Kasumi
     from app.system import Button, Camera
     from app.world import Wall, Door, Dialog, NPC, Kapi

@@ -1,10 +1,19 @@
-from cmath import phase
-
 import pygame
 import random
+import os
+import sys
 from app.world import Dialog
-from main import load_image
 from app.fighting.fighting_system import MainFight
+
+
+def load_image(name, color_key=None):
+    fullname = os.path.join("data/image", name)
+    # если файл не существует, то выходим
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    return image
 
 
 class Golem(MainFight):
@@ -16,7 +25,7 @@ class Golem(MainFight):
         super().__init__(npc, hp, damage)
 
     class Stone(pygame.sprite.Sprite):
-        def __init__(self, group, weapon, phase, n = True):
+        def __init__(self, group, weapon, phase, n=True):
             super().__init__(group)
             self.image = weapon[random.randint(0, 2)]
             self.mask = pygame.mask.from_surface(self.image)
@@ -71,29 +80,28 @@ class Golem(MainFight):
                 else:
                     self.rect.y += 8
 
-
     def new_logic(self):
         if (pygame.time.get_ticks() - self.start_ticks) / 1000 >= self.timer:
             if self.n == 1:
-                    self.timer += 0.17
-                    self.Stone(self.weapon_in_battle, self.weapon, self.n)
+                self.timer += 0.17
+                self.Stone(self.weapon_in_battle, self.weapon, self.n)
 
             if self.n == 2:
-                    self.timer += 0.21
-                    self.Stone(self.weapon_in_battle, self.weapon, self.n)
+                self.timer += 0.21
+                self.Stone(self.weapon_in_battle, self.weapon, self.n)
 
             if self.n == 3:
-                    self.timer += 0.17
-                    self.Stone(self.weapon_in_battle, self.weapon, self.n)
+                self.timer += 0.17
+                self.Stone(self.weapon_in_battle, self.weapon, self.n)
 
             if self.n == 4:
-                    self.timer += 0.21
-                    self.Stone(self.weapon_in_battle, self.weapon, self.n)
+                self.timer += 0.21
+                self.Stone(self.weapon_in_battle, self.weapon, self.n)
 
             if self.n == 5:
-                    self.timer += 0.4
-                    self.Stone(self.weapon_in_battle, self.weapon, self.n)
-                    self.Stone(self.weapon_in_battle, self.weapon, self.n, False)
+                self.timer += 0.4
+                self.Stone(self.weapon_in_battle, self.weapon, self.n)
+                self.Stone(self.weapon_in_battle, self.weapon, self.n, False)
         self.weapon_in_battle.update()
 
     def timer_apdate(self):
@@ -106,7 +114,7 @@ class Golem(MainFight):
                        ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
 
             else:
-                Dialog(['Готовься к настоящеё атаке!','Пфф.. Ты не сильнее пугала'],
+                Dialog(['Готовься к настоящеё атаке!', 'Пфф.. Ты не сильнее пугала'],
                        ['dialog/Golem/golem.png'],
                        ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
 
@@ -119,7 +127,6 @@ class Golem(MainFight):
             self.timer = 2
 
 
-
 class Kasumi(MainFight):
     def __init__(self, npc, hp, damage):
         self.main_music = pygame.mixer.Sound('data/music/fight/Dangerous sweetness.mp3')
@@ -129,7 +136,7 @@ class Kasumi(MainFight):
         super().__init__(npc, hp, damage)
 
     class Knife(pygame.sprite.Sprite):
-        def __init__(self, group, phase, n = True):
+        def __init__(self, group, phase, n=True):
             super().__init__(group)
             self.image = load_image('fight/Kasumi/knife_1.png')
 
@@ -179,7 +186,7 @@ class Kasumi(MainFight):
 
             elif self.phase == 2:
                 self.rect.x += 4
-                self.image = self.knife_img[self.counter//4]
+                self.image = self.knife_img[self.counter // 4]
                 self.counter += 1
                 if self.counter >= 72:
                     self.counter = 0
@@ -212,9 +219,8 @@ class Kasumi(MainFight):
                         self.counter = 0
                     self.rect.x -= 2
 
-
     class Fireball(pygame.sprite.Sprite):
-        def __init__(self, group, phase, n = True):
+        def __init__(self, group, phase, n=True):
             super().__init__(group)
             self.image = load_image('fight/Kasumi/fireball_right.png')
             self.mask = pygame.mask.from_surface(self.image)
@@ -234,7 +240,6 @@ class Kasumi(MainFight):
 
             self.phase = phase
 
-
         def update(self):
             if self.phase == 4 or self.phase == 5:
                 if self.n:
@@ -249,30 +254,30 @@ class Kasumi(MainFight):
     def new_logic(self):
         if (pygame.time.get_ticks() - self.start_ticks) / 1000 >= self.timer:
             if self.n == 1:
-                    self.timer += 0.09
-                    self.Knife(self.weapon_in_battle, self.n)
+                self.timer += 0.09
+                self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 2:
-                    self.timer += 0.25
-                    self.Knife(self.weapon_in_battle, self.n)
+                self.timer += 0.25
+                self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 3:
-                    self.timer += 0.4
-                    self.Knife(self.weapon_in_battle, self.n)
-                    self.Knife(self.weapon_in_battle, self.n, False)
+                self.timer += 0.4
+                self.Knife(self.weapon_in_battle, self.n)
+                self.Knife(self.weapon_in_battle, self.n, False)
 
             if self.n == 4:
-                    self.timer += 0.18
-                    self.Knife(self.weapon_in_battle, self.n)
-                    self.Fireball(self.weapon_in_battle, self.n)
-                    self.Fireball(self.weapon_in_battle, self.n, False)
+                self.timer += 0.18
+                self.Knife(self.weapon_in_battle, self.n)
+                self.Fireball(self.weapon_in_battle, self.n)
+                self.Fireball(self.weapon_in_battle, self.n, False)
 
             if self.n == 5:
-                    self.timer += 0.8
-                    self.Fireball(self.weapon_in_battle, self.n)
-                    self.Fireball(self.weapon_in_battle, self.n, False)
-                    self.Knife(self.weapon_in_battle, self.n)
-                    self.Knife(self.weapon_in_battle, self.n, False)
+                self.timer += 0.8
+                self.Fireball(self.weapon_in_battle, self.n)
+                self.Fireball(self.weapon_in_battle, self.n, False)
+                self.Knife(self.weapon_in_battle, self.n)
+                self.Knife(self.weapon_in_battle, self.n, False)
         self.weapon_in_battle.update()
 
     def timer_apdate(self):
@@ -308,7 +313,7 @@ class Ann(MainFight):
         super().__init__(npc, hp, damage)
 
     class Lian(pygame.sprite.Sprite):
-        def __init__(self, group, phase, n = True):
+        def __init__(self, group, phase, n=True):
             super().__init__(group)
             self.image = load_image('fight/Kasumi/knife.png')
             self.mask = pygame.mask.from_surface(self.image)
@@ -363,29 +368,28 @@ class Ann(MainFight):
                 else:
                     self.rect.y += 4
 
-
     def new_logic(self):
         if (pygame.time.get_ticks() - self.start_ticks) / 1000 >= self.timer:
             if self.n == 1:
-                    self.timer += 0.17
-                    self.Knife(self.weapon_in_battle, self.n)
+                self.timer += 0.17
+                self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 2:
-                    self.timer += 0.21
-                    self.Knife(self.weapon_in_battle, self.n)
+                self.timer += 0.21
+                self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 3:
-                    self.timer += 0.17
-                    self.Knife(self.weapon_in_battle, self.n)
+                self.timer += 0.17
+                self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 4:
-                    self.timer += 0.21
-                    self.Knife(self.weapon_in_battle, self.n)
+                self.timer += 0.21
+                self.Knife(self.weapon_in_battle, self.n)
 
             if self.n == 5:
-                    self.timer += 0.4
-                    self.Knife(self.weapon_in_battle, self.n)
-                    self.Knife(self.weapon_in_battle, self.n, False)
+                self.timer += 0.4
+                self.Knife(self.weapon_in_battle, self.n)
+                self.Knife(self.weapon_in_battle, self.n, False)
         self.weapon_in_battle.update()
 
     def timer_apdate(self):
@@ -398,7 +402,7 @@ class Ann(MainFight):
                        ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
 
             else:
-                Dialog(['Готовься к настоящеё атаке!','Пфф.. Ты не сильнее пугала'],
+                Dialog(['Готовься к настоящеё атаке!', 'Пфф.. Ты не сильнее пугала'],
                        ['dialog/Golem/golem.png'],
                        ['dialog/main_hero/perplexed.png']).dialog(self.draw_fight)
 
